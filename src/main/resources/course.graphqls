@@ -1,0 +1,27 @@
+type CourseInfoResult {
+    message: String
+    courseInfo: CourseInfo
+}
+
+type ManyCourseInfoResult {
+    message: String
+    courses: [CourseInfo]
+}
+
+type CoursewareInfo {
+    coursewareId: String
+    name: String
+    type: Int
+    timeCreate: String
+    timeModified: String
+}
+
+type CourseInfo {
+    coursrId: String
+    liveId: String
+    timeOpen: String
+    timeClose: String
+    state: String
+    organize: String
+    coursewares: [CoursewareInfo]
+}

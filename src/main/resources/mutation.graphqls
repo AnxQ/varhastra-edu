@@ -1,0 +1,4 @@
+type Mutation {
+#    register(input: RegisterInput): RegisterResult
+#    login(input: LoginInput): LoginResult
+}

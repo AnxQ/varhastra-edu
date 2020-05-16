@@ -1,0 +1,65 @@
+type UserInfoResult {
+    message: String
+    userInfo: UserInfo
+}
+
+input LoginInput {
+    info: String!
+    password: String!
+}
+
+input RegisterInput {
+    name: String!
+    password: String!
+    majorId: String!
+    mail: String!
+}
+
+type UserInfo {
+    userId: String
+    name: String
+    avatar: String
+    number: String
+    department: DepartmentInfo
+    major: MajorInfo
+    mail: String
+    role: String
+    motto: String
+    state: String
+    gender: String
+    joinDate: String
+}
+
+type ManyUserInfoResult {
+    message: String
+    users: [UserInfo]
+}
+
+type DepartmentInfoReuslt {
+    message: String
+    departments: [DepartmentInfo]
+}
+
+type DepartmentInfo {
+    departId: String
+    name: String
+    majors: [MajorInfo]
+}
+
+type ManyDepartmentInfoResult {
+    message: String
+    departments: [DepartmentInfo]
+}
+
+type MajorInfo {
+    majorId: String
+    name: String
+}
+
+type LoginResult {
+    message: String
+}
+
+type RegisterResult {
+    message: String
+}

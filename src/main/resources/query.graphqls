@@ -1,0 +1,14 @@
+type Query {
+    user(id: String): UserInfoResult
+    users(departId: String,
+        majorId: String,
+        courseId: String,
+        groupId: String,
+        activityId: String): ManyUserInfoResult
+    department(id: String!): DepartmentInfo
+    major(id: String!): MajorInfo
+    departments: ManyDepartmentInfoResult
+
+    course(id: String): CourseInfoResult
+    courses(userId: String): CourseInfoResult
+}
