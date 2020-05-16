@@ -1,5 +1,7 @@
 package top.varhastra.edu.Service;
 
+import graphql.schema.DataFetchingEnvironment;
+import graphql.servlet.context.DefaultGraphQLServletContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,7 @@ import top.varhastra.edu.Dao.*;
 import top.varhastra.edu.Entity.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,5 +113,14 @@ public class UserService {
                 .stream()
                 .map(UserCourse::getUser)
                 .collect(Collectors.toList());
+    }
+
+    public User getCurrentUser( DataFetchingEnvironment environment ) {
+        DefaultGraphQLServletContext context = environment.getContext();
+        HttpSession session = context.getHttpServletRequest().getSession();
+        if (session.getAttribute("isAuth") != null && (boolean) session.getAttribute("isAuth")) {
+            Long currentUserId = (Long) session.getAttribute("userId");
+            return userRepository.findByUserId(currentUserId);
+        } return null;
     }
 }

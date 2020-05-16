@@ -13,6 +13,7 @@ import java.util.Objects;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@IdClass(UserCourse.class)
 @Table(name = "user_course")
 public class UserCourse implements Serializable {
     @Id

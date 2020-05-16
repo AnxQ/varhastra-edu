@@ -9,6 +9,6 @@ type Query {
     major(id: String!): MajorInfo
     departments: ManyDepartmentInfoResult
 
-    course(id: String): CourseInfoResult
-    courses(userId: String): CourseInfoResult
+    course(id: String!): CourseInfoResult
+    courses(userId: String): ManyCourseInfoResult
 }

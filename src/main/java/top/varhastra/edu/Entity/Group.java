@@ -37,6 +37,10 @@ public class Group {
         this.users = users;
     }
 
+    public long getGroupId() {
+        return groupId;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -210,6 +210,14 @@ public class User {
         this.state = state;
     }
 
+    public List<UserCourse> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<UserCourse> courses) {
+        this.courses = courses;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

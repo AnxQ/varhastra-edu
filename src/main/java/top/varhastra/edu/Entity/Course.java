@@ -10,6 +10,7 @@ import top.varhastra.edu.Entity.Enum.CourseState;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -33,10 +34,10 @@ public class Course {
     private String liveId;
 
     @OneToOne(cascade = {CascadeType.REMOVE})
-    @JoinColumn(name="group_id", referencedColumnName = "group_id", nullable = false)
+    @JoinColumn(name="group_id", referencedColumnName = "group_id", nullable = true)
     private Group group = null;
 
-    @NotEmpty
+    @NotNull
     @Column(name="gmt_open")
     private Timestamp gmtOpen;
 
@@ -48,7 +49,7 @@ public class Course {
     @Column(name="description")
     private String description;
 
-    @NotEmpty
+    @NotNull
     @Column(name="gmt_close")
     private Timestamp gmtClose;
 
@@ -62,12 +63,51 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<Courseware> coursewares;
 
-    @Type(type = "json")
-    @Column(name="organize", columnDefinition = "json")
-    private List<Chapter> organize;
+    @Column(name="organize")
+    private String organize;
 
     @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private List<UserCourse> users;
+
+    public String getOrganize() {
+        return organize;
+    }
+
+    public void setOrganize(String organize) {
+        this.organize = organize;
+    }
+
+    public long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(long courseId) {
+        this.courseId = courseId;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getLiveId() {
         return liveId;
@@ -117,14 +157,6 @@ public class Course {
         this.coursewares = coursewares;
     }
 
-    public List<Chapter> getOrganize() {
-        return organize;
-    }
-
-    public void setOrganize(List<Chapter> organize) {
-        this.organize = organize;
-    }
-
     public List<UserCourse> getUsers() {
         return users;
     }
@@ -143,8 +175,3 @@ public class Course {
     }
 }
 
-class Chapter implements Serializable {
-    int ordinal;
-    String name;
-    Map<Integer, Long> coursewareIds;
-}

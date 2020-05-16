@@ -65,9 +65,10 @@ public class CourseService {
         for (long userId : userIds) {
             User user = userRepository.findByUserId(userId);
             UserCourse userCourse = userCourseRepository.findByUserAndCourse(user, course);
-            assert user == null || userCourse == null:
+            assert user != null && userCourse != null:
                     String.format("Failed to kick user: %s in %s", userId, courseId);
             userCourseRepository.delete(userCourse);
         }
     }
+
 }
