@@ -15,14 +15,17 @@ import java.util.Objects;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "user_group")
 public class UserGroup implements Serializable {
-    @Id
+    @EmbeddedId
+    private UserGroupId id;
+
     @NotNull
+    @MapsId("user_id")
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @ManyToOne
     private User user;
 
-    @Id
     @NotNull
+    @MapsId("group_id")
     @JoinColumn(name = "group_id", referencedColumnName = "group_id")
     @ManyToOne
     private Group group;

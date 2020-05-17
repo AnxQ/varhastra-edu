@@ -12,35 +12,8 @@ public class ManyUserInfoResult extends BaseResult {
         this.message = msg;
     }
 
-    public ManyUserInfoResult(List<User> users, boolean hideDetails) {
-        this.users = users.stream().map(user -> hideDetails ?
-                new UserInfo(
-                        user.getUserId(),
-                        user.getName(),
-                        user.getAvatar(),
-                        user.getNumber(),
-                        user.getMajor().getDepart(),
-                        user.getMajor(),
-                        user.getMail(),
-                        user.getRole(),
-                        user.getMotto(),
-                        user.getState(),
-                        user.getGender(),
-                        user.getGmtCreated()) :
-                new UserInfo(
-                        user.getUserId(),
-                        user.getName(),
-                        user.getAvatar(),
-                        "",
-                        user.getMajor().getDepart(),
-                        user.getMajor(),
-                        "",
-                        user.getRole(),
-                        user.getMotto(),
-                        "",
-                        "",
-                        user.getGmtCreated())
-        ).collect(Collectors.toList());
+    public ManyUserInfoResult(List<User> users, boolean addDetails) {
+        this.users = users.stream().map(user -> new UserInfo(user, addDetails)).collect(Collectors.toList());
     }
 
     public List<UserInfo> getUsers() {

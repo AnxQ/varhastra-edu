@@ -5,6 +5,7 @@ import graphql.servlet.context.DefaultGraphQLServletContext;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import top.varhastra.edu.Entity.Enum.UserRole;
 import top.varhastra.edu.Entity.User;
 import top.varhastra.edu.Graphql.types.*;
 import top.varhastra.edu.Service.InfoService;
@@ -26,29 +27,27 @@ public class UserQuery implements GraphQLQueryResolver {
     }
 
     public UserInfoResult user(String id, DataFetchingEnvironment environment) {
-        DefaultGraphQLServletContext context = environment.getContext();
-        HttpSession session = context.getHttpServletRequest().getSession();
-
-        long currentUserId = -1;
-        long queryUserId = 0;
-        if (session.getAttribute("isAuth") == null || !(boolean) session.getAttribute("isAuth")) {
-            if (id == null) {
-                return new UserInfoResult("Unable to identify.");
-            } else {
-                queryUserId = Long.parseLong(id);
-            }
+        User opUser = userService.getCurrentUser(environment);
+        if (id == null) {
+            return opUser == null ?
+                    new UserInfoResult("Unable to identify.") :
+                    new UserInfoResult(opUser, true);
         } else {
-            currentUserId = (Long) session.getAttribute("userId");
+            User user = userService.getUserById(Long.parseLong(id));
+            return user == null ?
+                new UserInfoResult("Unable to find user") :
+                new UserInfoResult(user, user == opUser);
         }
-        User user = userService.getUserById(queryUserId == 0 ? currentUserId : queryUserId);
-        return new UserInfoResult(user, user.getUserId() == currentUserId);
     }
 
     public ManyUserInfoResult users(String departId,
                                     String majorId,
                                     String courseId,
                                     String groupId,
-                                    String activityId) {
+                                    String activityId, DataFetchingEnvironment environment) {
+        User opUser = userService.getCurrentUser(environment);
+        if (opUser == null)
+            return new ManyUserInfoResult("Permission denied.");
         List<User> result = null;
         if(departId != null)
             result = userService.getUsersByDepartId(Long.parseLong(departId));
@@ -58,7 +57,9 @@ public class UserQuery implements GraphQLQueryResolver {
             result = userService.getUsersByCourseId(Long.parseLong(courseId));
         else if(groupId != null)
             result = userService.getUsersByGroupId(Long.parseLong(groupId));
-        return result == null ? new ManyUserInfoResult("query condition missed") : new ManyUserInfoResult(result, true);
+        return result == null ?
+                new ManyUserInfoResult("Query condition missed") :
+                new ManyUserInfoResult(result, opUser.getRole() == UserRole.GM);
     }
 
     public ManyDepartmentInfoResult departments() {

@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import top.varhastra.edu.Dao.*;
 import top.varhastra.edu.Entity.*;
+import top.varhastra.edu.Entity.Enum.UserRole;
+import top.varhastra.edu.Entity.Enum.UserState;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -39,22 +41,21 @@ public class UserService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public String register(String name,
+    public User register(String name,
                            String password,
                            long majorId,
-                           String mail) {
+                           String mail) throws Exception {
         if (isMailExist(mail))
-            return "Mail has been used";
+            throw new Exception("Mail has been used");
         if (isNameExist(name))
-            return "Name has been used";
+            throw new Exception("Name has been used");
         User user = new User();
         user.setName(name);
         user.setPassword(password);
         user.setMajor(majorRepository.findByMajorId(majorId));
         user.setMail(mail);
-        user.setState("U_STATE_VERIFY");
         userRepository.save(user);
-        return "";
+        return user;
     }
 
     @Transactional
@@ -76,8 +77,10 @@ public class UserService {
                                String mail,
                                String number,
                                String phone,
-                               String gender) {
+                               String gender) throws Exception{
         User user = userRepository.findByUserId(userId);
+        if (user == null)
+            throw new Exception(String.format("Unable to find user %s", userId));
         user.setMajor(majorRepository.findByMajorId(majorId));
         user.setPassword(password);
         user.setMail(mail);
@@ -115,6 +118,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public UserRole getCurrentRole(DataFetchingEnvironment environment) {
+        DefaultGraphQLServletContext context = environment.getContext();
+        HttpSession session = context.getHttpServletRequest().getSession();
+        if (session.getAttribute("roleType") != null) {
+            return (UserRole) session.getAttribute("roleType");
+        } return UserRole.ANONYMOUS;
+    }
+
     public User getCurrentUser( DataFetchingEnvironment environment ) {
         DefaultGraphQLServletContext context = environment.getContext();
         HttpSession session = context.getHttpServletRequest().getSession();
@@ -122,5 +133,13 @@ public class UserService {
             Long currentUserId = (Long) session.getAttribute("userId");
             return userRepository.findByUserId(currentUserId);
         } return null;
+    }
+
+    public void updateSession(DataFetchingEnvironment environment, User user) {
+        DefaultGraphQLServletContext context = environment.getContext();
+        HttpSession session = context.getHttpServletRequest().getSession();
+        session.setAttribute("isAuth", true);
+        session.setAttribute("roleType", user.getRole());
+        session.setAttribute("userId", user.getUserId());
     }
 }

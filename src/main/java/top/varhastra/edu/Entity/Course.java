@@ -11,11 +11,13 @@ import top.varhastra.edu.Entity.Enum.CourseState;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @TypeDefs({
         @TypeDef(name = "json", typeClass = JsonStringType.class),
@@ -44,6 +46,10 @@ public class Course {
     @Column(name="cover")
     private String cover;
 
+    @NotEmpty
+    @Column(name="title")
+    private String title;
+
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name="description")
@@ -67,7 +73,15 @@ public class Course {
     private String organize;
 
     @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    private List<UserCourse> users;
+    private Set<UserCourse> users;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getOrganize() {
         return organize;
@@ -157,11 +171,11 @@ public class Course {
         this.coursewares = coursewares;
     }
 
-    public List<UserCourse> getUsers() {
+    public Set<UserCourse> getUsers() {
         return users;
     }
 
-    public void setUsers(List<UserCourse> users) {
+    public void setUsers(Set<UserCourse> users) {
         this.users = users;
     }
 

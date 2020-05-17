@@ -23,9 +23,9 @@ type UserInfo {
     department: DepartmentInfo
     major: MajorInfo
     mail: String
-    role: String
+    role: Int
     motto: String
-    state: String
+    state: Int
     gender: String
     joinDate: String
 }
@@ -54,12 +54,4 @@ type ManyDepartmentInfoResult {
 type MajorInfo {
     majorId: String
     name: String
-}
-
-type LoginResult {
-    message: String
-}
-
-type RegisterResult {
-    message: String
 }

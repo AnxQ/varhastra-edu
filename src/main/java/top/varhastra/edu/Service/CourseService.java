@@ -1,5 +1,6 @@
 package top.varhastra.edu.Service;
 
+import com.google.common.collect.Iterables;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.varhastra.edu.Dao.CourseRepository;
@@ -16,6 +17,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
@@ -32,6 +35,18 @@ public class CourseService {
         return userCourseRepository.findByUserAndCourse(user, course) != null;
     }
 
+    public boolean adminCourse(User opUser, Course course) {
+        if (opUser == null)
+            return false;
+        if (opUser.getRole().equals("GM"))
+            return true;
+        UserCourse userCourse = userCourseRepository.findByUserAndCourse(opUser, course);
+        return userCourse != null &&
+                (userCourse.getCoursePrivilege() == CoursePrivilege.ASSISTANT ||
+                        userCourse.getCoursePrivilege() == CoursePrivilege.TEACHER ||
+                        userCourse.getUser().getRole().equals("GM"));
+    }
+
     public Course getCourse(long courseId) {
         return courseRepository.findByCourseId(courseId);
     }
@@ -39,36 +54,49 @@ public class CourseService {
     @Transactional(rollbackFor = Exception.class)
     public void joinCourse(List<Long> userIds, long courseId) throws Exception {
         Course course = courseRepository.findByCourseId(courseId);
-        assert course != null : String.format("Course %s not exist", courseId);
-        for (long userId : userIds) {
-            User user = userRepository.findByUserId(userId);
-            assert user != null || isUserInGroup(user, course) :
-                    String.format("Failed to join user %s into course %s", userId, courseId);
-            UserCourse join = new UserCourse();
-            join.setUser(user);
-            join.setCourse(course);
-            join.setGmtLastModify(new Timestamp(System.currentTimeMillis()));
-            userCourseRepository.save(join);
-        }
+        if (course == null)
+            throw new Exception(String.format("Course %s not exist", courseId));
+        course.getUsers().addAll(userIds.stream()
+                .map(userRepository::findByUserId)
+                .filter(Objects::nonNull)
+                .map(user -> new UserCourse(user, course))
+                .collect(Collectors.toList()));
+        courseRepository.save(course);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void kickCourse(List<Long> userIds, long courseId, long operateUserId) throws Exception {
+    public void kickCourse(List<Long> userIds, long courseId, User opUser) throws Exception {
         Course course = courseRepository.findByCourseId(courseId);
-        assert course != null : String.format("Course %s not exist", courseId);
-        User operateUser = userRepository.findByUserId(operateUserId);
-        assert operateUser != null : "Permission denied.";
-        UserCourse opUserCourse = userCourseRepository.findByUserAndCourse(operateUser, course);
-        assert opUserCourse != null &&
-                (opUserCourse.getCoursePrivilege() == CoursePrivilege.TEACHER ||
-                        opUserCourse.getCoursePrivilege() == CoursePrivilege.ASSISTANT) : "Permission denied.";
-        for (long userId : userIds) {
-            User user = userRepository.findByUserId(userId);
-            UserCourse userCourse = userCourseRepository.findByUserAndCourse(user, course);
-            assert user != null && userCourse != null:
-                    String.format("Failed to kick user: %s in %s", userId, courseId);
-            userCourseRepository.delete(userCourse);
-        }
+        if (course == null)
+            throw new Exception(String.format("Course %s not exist", courseId));
+        if (!adminCourse(opUser, course))
+            throw new Exception("Permission Denied.");
+        course.getUsers().removeAll(userIds.stream()
+                .map(userId -> userCourseRepository.findByUserIdAndCourseId(userId, courseId))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
+        courseRepository.save(course);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void setAssistant(List<Long> userIds, long courseId, User opUser) throws Exception {
+        Course course = courseRepository.findByCourseId(courseId);
+        if (course == null)
+            throw new Exception(String.format("Course %s not exist", courseId));
+        if (!adminCourse(opUser, course))
+            throw new Exception("Permission Denied.");
+        course.getUsers().addAll(userIds.stream()
+                .map(userId -> userCourseRepository.findByUserIdAndCourseId(userId, courseId))
+                .filter(userCourse -> Objects.nonNull(userCourse) &&
+                        userCourse.getCoursePrivilege() != CoursePrivilege.TEACHER)
+                .peek(userCourse -> userCourse.setCoursePrivilege(CoursePrivilege.ASSISTANT))
+                .collect(Collectors.toList()));
+        courseRepository.save(course);
+    }
+
+    @Transactional
+    public void createCourse () {
+
     }
 
 }

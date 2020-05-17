@@ -2,7 +2,10 @@ package top.varhastra.edu.Graphql.types;
 
 import top.varhastra.edu.Entity.Department;
 import top.varhastra.edu.Entity.Major;
+import top.varhastra.edu.Entity.User;
+import top.varhastra.edu.Utils.Utils;
 
+import javax.rmi.CORBA.Util;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -13,37 +16,28 @@ public class UserInfo {
     private String number;
     private DepartmentInfo department;
     private MajorInfo major;
-    private String mail;
-    private String role;
+    private String mail = "";
+    private int role = -1;
     private String motto;
-    private String state;
+    private int state;
     private String gender;
     private String joinDate;
 
-    public UserInfo(long userId,
-                    String name,
-                    String avatar,
-                    String number,
-                    Department department,
-                    Major major,
-                    String mail,
-                    String role,
-                    String motto,
-                    String state,
-                    String gender,
-                    Timestamp joinTime) {
-        this.userId = Long.toString(userId);
-        this.name = name;
-        this.avatar = avatar;
-        this.number = number;
-        this.department = new DepartmentInfo(department);
-        this.major = new MajorInfo(major);
-        this.mail = mail;
-        this.role = role;
-        this.motto = motto;
-        this.state = state;
-        this.gender = gender;
-        this.joinDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(joinTime);
+    public UserInfo(User user, boolean addDetails) {
+        this.userId = Long.toString(user.getUserId());
+        this.name = user.getName();
+        this.avatar = user.getAvatar();
+        this.department = new DepartmentInfo(user.getMajor().getDepart());
+        this.major = new MajorInfo(user.getMajor());
+        this.joinDate = Utils.formatTime(user.getGmtCreated());
+        this.motto = user.getMotto();
+        if (addDetails) {
+            this.role = user.getRole().ordinal();
+            this.number = user.getNumber();
+            this.mail = user.getMail();
+            this.state = user.getUserState().ordinal();
+            this.gender = user.getGender();
+        }
     }
 
     public String getUserId() {
@@ -106,11 +100,11 @@ public class UserInfo {
         this.mail = mail;
     }
 
-    public String getRole() {
+    public int getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(int role) {
         this.role = role;
     }
 
@@ -122,12 +116,16 @@ public class UserInfo {
         this.motto = motto;
     }
 
-    public String getState() {
+    public int getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(int state) {
         this.state = state;
+    }
+
+    public void setJoinDate(String joinDate) {
+        this.joinDate = joinDate;
     }
 
     public String getGender() {

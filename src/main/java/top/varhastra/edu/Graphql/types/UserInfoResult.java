@@ -11,36 +11,8 @@ public class UserInfoResult extends BaseResult {
         this.setMessage(msg);
     }
 
-    public UserInfoResult(User user, boolean hideDetails) {
-        this.userInfo = hideDetails ?
-                new UserInfo(
-                        user.getUserId(),
-                        user.getName(),
-                        user.getAvatar(),
-                        user.getNumber(),
-                        user.getMajor().getDepart(),
-                        user.getMajor(),
-                        user.getMail(),
-                        user.getRole(),
-                        user.getMotto(),
-                        user.getState(),
-                        user.getGender(),
-                        user.getGmtCreated()
-                ) :
-                new UserInfo(
-                        user.getUserId(),
-                        user.getName(),
-                        user.getAvatar(),
-                        "",
-                        user.getMajor().getDepart(),
-                        user.getMajor(),
-                        "",
-                        user.getRole(),
-                        user.getMotto(),
-                        "",
-                        "",
-                        user.getGmtCreated()
-                );
+    public UserInfoResult(User user, boolean addDetails) {
+        this.userInfo = new UserInfo(user, addDetails);
     }
 
     public UserInfo getUserInfo() {

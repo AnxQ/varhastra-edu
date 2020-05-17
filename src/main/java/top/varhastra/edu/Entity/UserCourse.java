@@ -13,33 +13,41 @@ import java.util.Objects;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@IdClass(UserCourse.class)
 @Table(name = "user_course")
 public class UserCourse implements Serializable {
-    @Id
+    public UserCourse() {}
+    public UserCourse(User user, Course course) {
+        this.user = user;
+        this.course = course;
+    }
+
+    @EmbeddedId
+    private UserCourseId id;
+
     @NotNull
+    @MapsId("user_id")
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @ManyToOne
     private User user;
 
-    @Id
     @NotNull
+    @MapsId("course_id")
     @JoinColumn(name = "course_id", referencedColumnName = "course_id")
     @ManyToOne
     private Course course;
 
-    @NotEmpty
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name="previl")
     private CoursePrivilege coursePrivilege = CoursePrivilege.STUDENT;
 
-    @NotEmpty
+    @NotNull
     @Column(name="gmt_join")
-    private Timestamp gmtJoin;
+    private Timestamp gmtJoin = new Timestamp(System.currentTimeMillis());
 
-    @NotEmpty
+    @NotNull
     @Column(name = "gmt_last_modify")
-    private Timestamp gmtLastModify;
+    private Timestamp gmtLastModify = new Timestamp(System.currentTimeMillis());
 
     public User getUser() {
         return user;

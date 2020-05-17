@@ -44,4 +44,44 @@ public class Comment {
     @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     @JoinColumn(name = "course_id")
     private Course course;
+
+    public long getCommentId() {
+        return commentId;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public Timestamp getGmtCreated() {
+        return gmtCreated;
+    }
+
+    public Timestamp getGmtModified() {
+        return gmtModified;
+    }
+
+    public Comment getReplyComment() {
+        return replyComment;
+    }
+
+    public List<Comment> getReplyList() {
+        return replyList;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public void setReplyList(List<Comment> replyList) {
+        this.replyList = replyList;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
 }

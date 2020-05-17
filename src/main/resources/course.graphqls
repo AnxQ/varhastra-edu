@@ -16,6 +16,14 @@ type CoursewareInfo {
     timeModified: String
 }
 
+type CommentInfo {
+    commentId: String
+    details: String
+    timeCreate: String
+    timeModified: String
+    replyTo: String
+}
+
 type CourseInfo {
     courseId: String
     liveId: String
@@ -23,6 +31,9 @@ type CourseInfo {
     timeClose: String
     state: Int
     cover: String
+    title: String
+    description: String
     organize: String
     coursewares: [CoursewareInfo]
+    comments: [CommentInfo]
 }

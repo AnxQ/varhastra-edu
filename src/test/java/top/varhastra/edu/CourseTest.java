@@ -3,13 +3,15 @@ package top.varhastra.edu;
 import com.alibaba.fastjson.JSON;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.test.context.ContextConfiguration;
 import top.varhastra.edu.Dao.CourseRepository;
-import top.varhastra.edu.Entity.Chapter;
-import top.varhastra.edu.Entity.Comment;
-import top.varhastra.edu.Entity.Course;
+import top.varhastra.edu.Dao.UserCourseRepository;
+import top.varhastra.edu.Entity.*;
+import top.varhastra.edu.Entity.Enum.CoursePrivilege;
 import top.varhastra.edu.Entity.Enum.CourseState;
 import top.varhastra.edu.Service.CourseService;
+import top.varhastra.edu.Service.UserService;
 
 import javax.annotation.Resource;
 import java.sql.Array;
@@ -20,6 +22,15 @@ import java.util.*;
 class CourseTest {
     @Resource
     private CourseRepository courseRepository;
+
+    @Resource
+    private UserCourseRepository userCourseRepository;
+
+    @Resource
+    private CourseService courseService;
+
+    @Resource
+    private UserService userService;
 
     @Test
     void addAndDeleteTest() {
@@ -37,6 +48,23 @@ class CourseTest {
         organize.add(new Chapter(3, "Chapter3", chapterMap));
         course.setOrganize(JSON.toJSONString(organize));
         courseRepository.save(course);
-        System.out.println("Object saved.");
+        courseRepository.delete(course);
+    }
+
+    @Test
+    void joinAndKickTest() {
+        long courseId = 10000;
+        User opUser = userService.getUserById(1414514L);
+        try {
+            courseService.joinCourse(Arrays.asList(114514L, 1414514L), courseId);
+            courseService.setAssistant(Arrays.asList(114514L, 1414514L), courseId, opUser);
+//            UserCourse uc = userCourseRepository.findByUserIdAndCourseId(1414514L, courseId);
+//            uc.setCoursePrivilege(CoursePrivilege.TEACHER);
+//            courseService.kickCourse(Collections.singletonList(1414514L), courseId, opUser);
+//            uc.setCoursePrivilege(CoursePrivilege.STUDENT);
+//            courseService.kickCourse(Arrays.asList(114514L, 1414514L), courseId, opUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

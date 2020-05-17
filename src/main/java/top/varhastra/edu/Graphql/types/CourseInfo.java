@@ -15,9 +15,11 @@ public class CourseInfo {
     String description;
     String timeOpen;
     String timeClose;
+    String title;
     Integer state;
     String organize;
     List<CoursewareInfo> coursewares;
+    List<CommentInfo> comments;
 
     public CourseInfo(Course course, boolean addDetails) {
         this.courseId = Long.toString(course.getCourseId());
@@ -28,9 +30,11 @@ public class CourseInfo {
         this.timeOpen = Utils.formatTime(course.getGmtOpen());
         this.timeClose = Utils.formatTime(course.getGmtClose());
         this.state = course.getState().ordinal();
+        this.title = course.getTitle();
         if (addDetails) {
             this.organize = course.getOrganize();
             this.coursewares = course.getCoursewares().stream().map(CoursewareInfo::new).collect(Collectors.toList());
+            this.comments = course.getComments().stream().map(CommentInfo::new).collect(Collectors.toList());
         }
     }
 
@@ -68,5 +72,17 @@ public class CourseInfo {
 
     public String getOrganize() {
         return organize;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public List<CoursewareInfo> getCoursewares() {
+        return coursewares;
+    }
+
+    public List<CommentInfo> getComments() {
+        return comments;
     }
 }

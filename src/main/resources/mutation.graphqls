@@ -1,4 +1,8 @@
 type Mutation {
-#    register(input: RegisterInput): RegisterResult
-#    login(input: LoginInput): LoginResult
+    register(input: RegisterInput): BaseResult
+    login(input: LoginInput): BaseResult
+}
+
+type BaseResult {
+    message: String
 }

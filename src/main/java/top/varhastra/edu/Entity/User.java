@@ -1,5 +1,7 @@
 package top.varhastra.edu.Entity;
 
+import top.varhastra.edu.Entity.Enum.UserRole;
+import top.varhastra.edu.Entity.Enum.UserState;
 import top.varhastra.edu.Entity.Major;
 
 import org.springframework.cglib.proxy.LazyLoader;
@@ -13,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 
 @Entity
@@ -41,9 +44,9 @@ public class User {
     private String number;
 
     @NotNull
-    @NotEmpty
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private String role = "U_ROLE_STU";
+    private UserRole role = UserRole.STUDENT;
 
     @NotEmpty
     @Column(name = "mail")
@@ -52,9 +55,9 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
-    @NotEmpty
+    @Enumerated(EnumType.STRING)
     @Column(name = "state")
-    private String state = "U_STAT_PENDING";
+    private UserState userState = UserState.PENDING;
 
     @NotNull
     @Column(name = "gmt_created")
@@ -84,7 +87,7 @@ public class User {
     private List<UserGroup> groups;
 
     @OneToMany(mappedBy = "user")
-    private List<UserCourse> courses;
+    private Set<UserCourse> courses;
 
     public List<UserGroup> getGroups() {
         return groups;
@@ -138,11 +141,11 @@ public class User {
         this.number = number;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 
@@ -202,19 +205,19 @@ public class User {
         this.avatar = avatar;
     }
 
-    public String getState() {
-        return state;
+    public UserState getUserState() {
+        return userState;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setUserState(UserState userState) {
+        this.userState = userState;
     }
 
-    public List<UserCourse> getCourses() {
+    public Set<UserCourse> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<UserCourse> courses) {
+    public void setCourses(Set<UserCourse> courses) {
         this.courses = courses;
     }
 
@@ -226,4 +229,5 @@ public class User {
         User that = (User) o;
         return Objects.equals(userId, that.userId);
     }
+
 }
