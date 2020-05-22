@@ -27,7 +27,7 @@ public class User {
     @GeneratedValue
     private long userId;
 
-    @NotEmpty
+    @NotNull
     @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH})
     @JoinColumn(name = "major_id")
     private Major major;
@@ -83,10 +83,10 @@ public class User {
     @Column(name = "motto")
     private String motto;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<UserGroup> groups;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserCourse> courses;
 
     public List<UserGroup> getGroups() {
@@ -227,7 +227,7 @@ public class User {
         if (o == null || getClass() != o.getClass())
             return false;
         User that = (User) o;
-        return Objects.equals(userId, that.userId);
+        return userId == that.userId;
     }
 
 }

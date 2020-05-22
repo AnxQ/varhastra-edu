@@ -16,8 +16,8 @@ public class UserInfo {
     private String number;
     private DepartmentInfo department;
     private MajorInfo major;
-    private String mail = "";
-    private int role = -1;
+    private String mail;
+    private int role;
     private String motto;
     private int state;
     private String gender;
@@ -31,8 +31,8 @@ public class UserInfo {
         this.major = new MajorInfo(user.getMajor());
         this.joinDate = Utils.formatTime(user.getGmtCreated());
         this.motto = user.getMotto();
+        this.role = user.getRole().ordinal();
         if (addDetails) {
-            this.role = user.getRole().ordinal();
             this.number = user.getNumber();
             this.mail = user.getMail();
             this.state = user.getUserState().ordinal();

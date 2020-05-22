@@ -1,6 +1,6 @@
 package top.varhastra.edu.Graphql.resolvers;
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver;
+import graphql.kickstart.tools.GraphQLQueryResolver;
 import graphql.schema.DataFetchingEnvironment;
 import org.springframework.stereotype.Component;
 import top.varhastra.edu.Entity.User;

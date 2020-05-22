@@ -1,8 +1,7 @@
 package top.varhastra.edu.Graphql.resolvers;
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver;
-import graphql.servlet.context.DefaultGraphQLServletContext;
-import org.checkerframework.checker.units.qual.A;
+import graphql.kickstart.tools.GraphQLQueryResolver;
+import graphql.kickstart.servlet.context.DefaultGraphQLServletContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.varhastra.edu.Entity.Enum.UserRole;
@@ -36,7 +35,7 @@ public class UserQuery implements GraphQLQueryResolver {
             User user = userService.getUserById(Long.parseLong(id));
             return user == null ?
                 new UserInfoResult("Unable to find user") :
-                new UserInfoResult(user, user == opUser);
+                new UserInfoResult(user, user.equals(opUser));
         }
     }
 

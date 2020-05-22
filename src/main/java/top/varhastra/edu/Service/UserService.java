@@ -1,7 +1,7 @@
 package top.varhastra.edu.Service;
 
 import graphql.schema.DataFetchingEnvironment;
-import graphql.servlet.context.DefaultGraphQLServletContext;
+import graphql.kickstart.servlet.context.DefaultGraphQLServletContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,10 +129,20 @@ public class UserService {
     public User getCurrentUser( DataFetchingEnvironment environment ) {
         DefaultGraphQLServletContext context = environment.getContext();
         HttpSession session = context.getHttpServletRequest().getSession();
-        if (session.getAttribute("isAuth") != null && (boolean) session.getAttribute("isAuth")) {
+        System.out.println(session.getAttribute("isAuth"));
+        if (session.getAttribute("isAuth") != null &&
+                (boolean) session.getAttribute("isAuth")) {
             Long currentUserId = (Long) session.getAttribute("userId");
             return userRepository.findByUserId(currentUserId);
         } return null;
+    }
+
+    public void resetSession(DataFetchingEnvironment environment) {
+        DefaultGraphQLServletContext context = environment.getContext();
+        HttpSession session = context.getHttpServletRequest().getSession();
+        session.setAttribute("isAuth", false);
+        session.setAttribute("roleType",UserRole.ANONYMOUS);
+        session.setAttribute("userId", null);
     }
 
     public void updateSession(DataFetchingEnvironment environment, User user) {

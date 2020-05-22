@@ -1,6 +1,6 @@
 type UserInfoResult {
     message: String
-    userInfo: UserInfo
+    user: UserInfo
 }
 
 input LoginInput {

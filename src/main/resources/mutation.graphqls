@@ -1,6 +1,13 @@
 type Mutation {
-    register(input: RegisterInput): BaseResult
-    login(input: LoginInput): BaseResult
+    register(input: RegisterInput): AuthResult
+    login(input: LoginInput): AuthResult
+    logout: BaseResult
+}
+
+type AuthResult {
+    message: String
+    userId: String
+    role: Int
 }
 
 type BaseResult {
