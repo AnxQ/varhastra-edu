@@ -9,6 +9,7 @@ import top.varhastra.edu.Dao.UserRepository;
 import top.varhastra.edu.Entity.*;
 import top.varhastra.edu.Entity.Enum.CoursePrivilege;
 import top.varhastra.edu.Entity.Enum.GroupPrivilege;
+import top.varhastra.edu.Entity.Enum.UserRole;
 
 import javax.annotation.Resource;
 import javax.persistence.RollbackException;
@@ -37,7 +38,7 @@ public class CourseService {
     public boolean adminCourse(User opUser, Course course) {
         if (opUser == null)
             return false;
-        if (opUser.getRole().equals("GM"))
+        if (opUser.getRole() == UserRole.GM)
             return true;
         UserCourse userCourse = userCourseRepository.findByUserAndCourse(opUser, course);
         return userCourse != null &&
