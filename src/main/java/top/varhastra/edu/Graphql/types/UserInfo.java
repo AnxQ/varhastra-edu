@@ -23,6 +23,12 @@ public class UserInfo {
     private String gender;
     private String joinDate;
 
+    public UserInfo(User user) {
+        this.userId = Long.toString(user.getUserId());
+        this.name = user.getName();
+        this.avatar = user.getAvatar();
+    }
+
     public UserInfo(User user, boolean addDetails) {
         this.userId = Long.toString(user.getUserId());
         this.name = user.getName();

@@ -89,6 +89,9 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserCourse> courses;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Comment> comments;
+
     public List<UserGroup> getGroups() {
         return groups;
     }
@@ -219,6 +222,14 @@ public class User {
 
     public void setCourses(Set<UserCourse> courses) {
         this.courses = courses;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     @Override

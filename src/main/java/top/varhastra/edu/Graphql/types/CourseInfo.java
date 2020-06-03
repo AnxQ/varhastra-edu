@@ -21,6 +21,10 @@ public class CourseInfo {
     List<CoursewareInfo> coursewares;
     List<CommentInfo> comments;
 
+    public CourseInfo(Course course) {
+        this(course, false);
+    }
+
     public CourseInfo(Course course, boolean addDetails) {
         this.courseId = Long.toString(course.getCourseId());
         this.groupId = course.getGroup() != null ? Long.toString(course.getGroup().getGroupId()) : null;

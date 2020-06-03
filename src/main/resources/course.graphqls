@@ -18,6 +18,7 @@ type CoursewareInfo {
 
 type CommentInfo {
     commentId: String
+    user: UserInfo
     details: String
     timeCreate: String
     timeModified: String

@@ -1,18 +1,19 @@
 package top.varhastra.edu.Graphql.resolvers;
 
 import graphql.kickstart.tools.GraphQLQueryResolver;
-import graphql.kickstart.servlet.context.DefaultGraphQLServletContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.varhastra.edu.Entity.Enum.UserRole;
 import top.varhastra.edu.Entity.User;
+import top.varhastra.edu.Graphql.execptions.UserException;
+import top.varhastra.edu.Graphql.execptions.UserException.Type;
 import top.varhastra.edu.Graphql.types.*;
 import top.varhastra.edu.Service.InfoService;
 import top.varhastra.edu.Service.UserService;
 import graphql.schema.DataFetchingEnvironment;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserQuery implements GraphQLQueryResolver {
@@ -25,44 +26,51 @@ public class UserQuery implements GraphQLQueryResolver {
         this.infoService = infoService;
     }
 
-    public UserInfoResult user(String id, DataFetchingEnvironment environment) {
+    public UserInfo user(String id, DataFetchingEnvironment environment) {
         User opUser = userService.getCurrentUser(environment);
-        if (id == null) {
-            return opUser == null ?
-                    new UserInfoResult("Unable to identify.") :
-                    new UserInfoResult(opUser, true);
+        System.out.println(opUser);
+        if (id == null || id.equals("")) {
+            if (opUser == null)
+                throw new UserException(Type.PERMISSION_DENIED);
+            return new UserInfo(opUser, true);
         } else {
             User user = userService.getUserById(Long.parseLong(id));
-            return user == null ?
-                new UserInfoResult("Unable to find user") :
-                new UserInfoResult(user, user.equals(opUser));
+            if (user == null)
+                throw new UserException(UserException.Type.USER_NOT_FIND);
+            return new UserInfo(user, user.equals(opUser));
         }
     }
 
-    public ManyUserInfoResult users(String departId,
+    public List<UserInfo> users(String departId,
                                     String majorId,
                                     String courseId,
                                     String groupId,
                                     String activityId, DataFetchingEnvironment environment) {
         User opUser = userService.getCurrentUser(environment);
         if (opUser == null)
-            return new ManyUserInfoResult("Permission denied.");
+            throw new UserException(Type.PERMISSION_DENIED);
         List<User> result = null;
-        if(departId != null)
+        if (departId != null)
             result = userService.getUsersByDepartId(Long.parseLong(departId));
-        else if(majorId != null)
+        else if (majorId != null)
             result = userService.getUsersByMajorId(Long.parseLong(majorId));
-        else if(courseId != null)
+        else if (courseId != null)
             result = userService.getUsersByCourseId(Long.parseLong(courseId));
-        else if(groupId != null)
+        else if (groupId != null)
             result = userService.getUsersByGroupId(Long.parseLong(groupId));
-        return result == null ?
-                new ManyUserInfoResult("Query condition missed") :
-                new ManyUserInfoResult(result, opUser.getRole() == UserRole.GM);
+        if (result == null)
+            throw new UserException(UserException.Type.CONDITION_INVALID);
+        return result
+                .stream()
+                .map(user -> new UserInfo(user, opUser.getRole().equals(UserRole.GM)))
+                .collect(Collectors.toList());
     }
 
-    public ManyDepartmentInfoResult departments() {
-        return new ManyDepartmentInfoResult(infoService.getAllDepartments());
+    public List<DepartmentInfo> departments() {
+        return infoService.getAllDepartments()
+                .stream()
+                .map(DepartmentInfo::new)
+                .collect(Collectors.toList());
     }
 
     public MajorInfo major(String majorId) {

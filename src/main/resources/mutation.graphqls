@@ -1,11 +1,11 @@
 type Mutation {
+    sendMsg(input: ChatMsgInput): BaseResult
     register(input: RegisterInput): AuthResult
     login(input: LoginInput): AuthResult
     logout: BaseResult
 }
 
 type AuthResult {
-    message: String
     userId: String
     role: Int
 }

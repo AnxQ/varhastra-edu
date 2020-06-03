@@ -31,7 +31,7 @@ public class CourseService {
     @Resource
     private UserCourseRepository userCourseRepository;
 
-    public boolean isUserInGroup(User user, Course course) {
+    public boolean isUserInCourse(User user, Course course) {
         return userCourseRepository.findByUserAndCourse(user, course) != null;
     }
 

@@ -1,0 +1,27 @@
+type ChatMsg {
+    type: String
+    msg: String
+    senderId: String
+}
+
+input ChatMsgInput {
+    groupId: String
+    type: String
+    msg: String
+}
+
+type GroupInfo {
+    groupId: String
+    name: String
+    users: [UserInfo]
+}
+
+type GroupInfoResult {
+    message: String
+    group: GroupInfo
+}
+
+type ManyGroupInfoResult {
+    message: String
+    groups: [GroupInfo]
+}

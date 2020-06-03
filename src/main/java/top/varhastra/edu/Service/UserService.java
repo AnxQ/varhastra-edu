@@ -46,9 +46,9 @@ public class UserService {
                            long majorId,
                            String mail) throws Exception {
         if (isMailExist(mail))
-            throw new Exception("Mail has been used");
+            throw new Exception("mail");
         if (isNameExist(name))
-            throw new Exception("Name has been used");
+            throw new Exception("name");
         User user = new User();
         user.setName(name);
         user.setPassword(password);
@@ -60,6 +60,8 @@ public class UserService {
 
     @Transactional
     public User login(String info, String password) {
+        if (info == null || password == null)
+            return null;
         User user = userRepository.findByName(info);
         if (user == null)
             user = userRepository.findByMail(info);
@@ -129,7 +131,6 @@ public class UserService {
     public User getCurrentUser( DataFetchingEnvironment environment ) {
         DefaultGraphQLServletContext context = environment.getContext();
         HttpSession session = context.getHttpServletRequest().getSession();
-        System.out.println(session.getAttribute("isAuth"));
         if (session.getAttribute("isAuth") != null &&
                 (boolean) session.getAttribute("isAuth")) {
             Long currentUserId = (Long) session.getAttribute("userId");
@@ -141,7 +142,7 @@ public class UserService {
         DefaultGraphQLServletContext context = environment.getContext();
         HttpSession session = context.getHttpServletRequest().getSession();
         session.setAttribute("isAuth", false);
-        session.setAttribute("roleType",UserRole.ANONYMOUS);
+        session.setAttribute("roleType", UserRole.ANONYMOUS);
         session.setAttribute("userId", null);
     }
 

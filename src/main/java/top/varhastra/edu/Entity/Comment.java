@@ -19,6 +19,11 @@ public class Comment {
     @GeneratedValue
     long commentId;
 
+    @NotNull
+    @ManyToOne(cascade=CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @Lob
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "details")
@@ -83,5 +88,25 @@ public class Comment {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) { 
+        this.user = user;
+    }
+
+    public void setGmtCreated(Timestamp gmtCreated) {
+        this.gmtCreated = gmtCreated;
+    }
+
+    public void setGmtModified(Timestamp gmtModified) {
+        this.gmtModified = gmtModified;
+    }
+
+    public void setReplyComment(Comment replyComment) {
+        this.replyComment = replyComment;
     }
 }

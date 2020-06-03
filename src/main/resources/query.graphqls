@@ -1,14 +1,17 @@
 type Query {
-    user(id: String): UserInfoResult
+    user(id: String): UserInfo
     users(departId: String,
         majorId: String,
         courseId: String,
         groupId: String,
-        activityId: String): ManyUserInfoResult
+        activityId: String): [UserInfo]
     department(id: String!): DepartmentInfo
     major(id: String!): MajorInfo
-    departments: ManyDepartmentInfoResult
+    departments: [DepartmentInfo]
 
-    course(id: String!): CourseInfoResult
-    courses(userId: String): ManyCourseInfoResult
+    course(id: String!): CourseInfo
+    courses(userId: String): [CourseInfo]
+
+    group(id: String!): GroupInfo
+    groups(userId: String): [GroupInfo]
 }

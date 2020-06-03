@@ -1,0 +1,9 @@
+type Subscription {
+    chat(groupIds: [String]): GroupChatMsg
+}
+
+type GroupChatMsg {
+    groupId: String
+    msgs: [ChatMsg]
+}
+

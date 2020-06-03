@@ -5,6 +5,7 @@ import top.varhastra.edu.Utils.Utils;
 
 public class CommentInfo {
     String commentId;
+    UserInfo user;
     String details;
     String timeCreate;
     String timeModified;
@@ -12,6 +13,7 @@ public class CommentInfo {
 
     public CommentInfo(Comment comment) {
         this.commentId = Long.toString(comment.getCommentId());
+        this.user = new UserInfo(comment.getUser());
         this.details = comment.getDetails();
         this.timeCreate = Utils.formatTime(comment.getGmtCreated());
         this.timeModified = Utils.formatTime(comment.getGmtModified());

@@ -47,6 +47,6 @@ public class Group {
         if (o == null || getClass() != o.getClass())
             return false;
         Group that = (Group) o;
-        return Objects.equals(groupId, that.groupId);
+        return groupId == that.groupId;
     }
 }

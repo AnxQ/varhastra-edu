@@ -3,9 +3,10 @@ package top.varhastra.edu.Graphql.resolvers;
 import graphql.kickstart.tools.GraphQLMutationResolver;
 
 import graphql.schema.DataFetchingEnvironment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.varhastra.edu.Entity.User;
+import top.varhastra.edu.Graphql.execptions.UserException;
+import top.varhastra.edu.Graphql.execptions.UserException.Type;
 import top.varhastra.edu.Graphql.types.AuthResult;
 import top.varhastra.edu.Graphql.types.BaseResult;
 import top.varhastra.edu.Graphql.types.LoginInput;
@@ -29,30 +30,21 @@ public class UserMutation implements GraphQLMutationResolver {
             userService.updateSession(environment, user);
             return new AuthResult(user);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new AuthResult(e.getMessage());
+            throw new UserException(Type.FIELD_INVALID, e.getMessage());
         }
     }
 
     public AuthResult login(LoginInput input, DataFetchingEnvironment environment) {
-        try {
-            User user = userService.login(input.getInfo(), input.getPassword());
-            userService.updateSession(environment, user);
-            return new AuthResult(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new AuthResult(e.getMessage());
-        }
-
-    }
+        User user = userService.login(input.getInfo(), input.getPassword());
+        if (user == null)
+            throw new UserException(Type.BAD_CREDENTIAL);
+        userService.updateSession(environment, user);
+        return new AuthResult(user);
+}
 
     public BaseResult logout(DataFetchingEnvironment environment) {
-        try {
-            userService.resetSession(environment);
-            return new BaseResult();
-        } catch (Exception e) {
-            return new BaseResult(e.getMessage());
-        }
+        userService.resetSession(environment);
+        return new BaseResult();
     }
 
 }
