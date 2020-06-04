@@ -18,7 +18,7 @@ public class Group {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", cascade = { CascadeType.REMOVE })
     private List<UserGroup> users;
 
     public String getName() {

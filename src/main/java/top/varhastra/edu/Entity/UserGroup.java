@@ -15,6 +15,12 @@ import java.util.Objects;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "user_group")
 public class UserGroup implements Serializable {
+    public UserGroup() {}
+    public UserGroup(User user, Group group) {
+        this.id = new UserGroupId(user.getUserId(), group.getGroupId());
+        this.user = user;
+    }
+
     @EmbeddedId
     private UserGroupId id;
 

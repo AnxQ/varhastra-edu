@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import top.varhastra.edu.Dao.*;
 import top.varhastra.edu.Entity.*;
 import top.varhastra.edu.Entity.Enum.CoursePrivilege;
+import top.varhastra.edu.Entity.Enum.GroupPrivilege;
 import top.varhastra.edu.Entity.Enum.UserRole;
 import top.varhastra.edu.Entity.Enum.UserState;
 import top.varhastra.edu.Graphql.execptions.CourseException;
@@ -25,6 +26,8 @@ public class CourseService {
     private UserRepository userRepository;
     @Resource
     private CoursewareRepository coursewareRepository;
+    @Resource
+    private GroupRepository groupRepository;
     @Resource
     private CommentRepository commentRepository;
     @Resource
@@ -52,7 +55,7 @@ public class CourseService {
 
     @Transactional(rollbackFor = Exception.class)
     public void joinCourse(List<Long> userIds, long courseId) throws CourseException {
-        Course course = courseRepository.findByCourseId(courseId);
+        Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
         course.getUsers().addAll(userIds.stream()
@@ -65,7 +68,7 @@ public class CourseService {
 
     @Transactional(rollbackFor = Exception.class)
     public void leaveCourse(List<Long> userIds, long courseId, User opUser) throws CourseException {
-        Course course = courseRepository.findByCourseId(courseId);
+        Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
         if (!adminCourse(opUser, course) && !isUserInCourse(opUser, course))
@@ -76,7 +79,7 @@ public class CourseService {
 
     @Transactional(rollbackFor = Exception.class)
     public void setAssistant(List<Long> userIds, long courseId, User opUser) throws Exception {
-        Course course = courseRepository.findByCourseId(courseId);
+        Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
         if (!adminCourse(opUser, course))
@@ -92,7 +95,7 @@ public class CourseService {
 
     @Transactional(rollbackFor = CourseException.class)
     public void addComment(String details, Long replyTo, User opUser, long courseId) {
-        Course course = courseRepository.findByCourseId(courseId);
+        Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
         if (!isUserInCourse(opUser, course) || opUser.getUserState().equals(UserState.BANNED))
@@ -119,8 +122,28 @@ public class CourseService {
     }
 
     @Transactional
-    public void createCourse () {
+    public void openGroup(Long courseId, User opUser) {
+        Course course = getCourse(courseId);
+        if (!adminCourse(opUser, course))
+            throw new CourseException(Type.PERMISSION_DENIED);
+        Group group = new Group();
+        group.setName(course.getTitle() + "群");
+        group.setUsers(course.getUsers().stream()
+                .map( user -> {
+                    UserGroup userGroup = new UserGroup(user.getUser(), group);
+                    userGroup.setGroupPrivilege(
+                            user.getCoursePrivilege().equals(CoursePrivilege.TEACHER) ?
+                                    GroupPrivilege.CREATOR : GroupPrivilege.MEMBER);
+                    return userGroup;
+                }).collect(Collectors.toList()));
+        course.setGroup(group);
+        groupRepository.save(group);
+        courseRepository.save(course);
+    }
 
+    @Transactional
+    public void createCourse () {
+        
     }
 
 }
