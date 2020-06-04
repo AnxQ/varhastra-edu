@@ -21,17 +21,13 @@ public class UserMutation implements GraphQLMutationResolver {
     private UserService userService;
 
     public AuthResult register(RegisterInput input, DataFetchingEnvironment environment) {
-        try {
-            User user = userService.register(
-                    input.getName(),
-                    input.getPassword(),
-                    Long.parseLong(input.getMajorId()),
-                    input.getMail());
-            userService.updateSession(environment, user);
-            return new AuthResult(user);
-        } catch (Exception e) {
-            throw new UserException(Type.FIELD_INVALID, e.getMessage());
-        }
+        User user = userService.register(
+                input.getName(),
+                input.getPassword(),
+                Long.parseLong(input.getMajorId()),
+                input.getMail());
+        userService.updateSession(environment, user);
+        return new AuthResult(user);
     }
 
     public AuthResult login(LoginInput input, DataFetchingEnvironment environment) {

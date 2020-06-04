@@ -6,6 +6,12 @@ import java.io.Serializable;
 
 @Embeddable
 public class UserCourseId implements Serializable {
+    public UserCourseId() {}
+    public UserCourseId(long userId, long courseId) {
+        this.courseId = courseId;
+        this.userId = userId;
+    }
+
     @Column(name = "user_id")
     private long userId;
 

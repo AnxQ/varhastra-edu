@@ -2,9 +2,7 @@ package top.varhastra.edu.Entity;
 
 import top.varhastra.edu.Entity.Enum.UserRole;
 import top.varhastra.edu.Entity.Enum.UserState;
-import top.varhastra.edu.Entity.Major;
 
-import org.springframework.cglib.proxy.LazyLoader;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,7 +12,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 
@@ -28,7 +25,7 @@ public class User {
     private long userId;
 
     @NotNull
-    @ManyToOne(cascade={CascadeType.MERGE,CascadeType.REFRESH})
+    @ManyToOne(cascade={CascadeType.DETACH})
     @JoinColumn(name = "major_id")
     private Major major;
 
@@ -83,13 +80,13 @@ public class User {
     @Column(name = "motto")
     private String motto;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE})
     private List<UserGroup> groups;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private Set<UserCourse> courses;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.MERGE})
     private List<Comment> comments;
 
     public List<UserGroup> getGroups() {

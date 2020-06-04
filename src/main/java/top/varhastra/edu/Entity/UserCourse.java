@@ -19,6 +19,7 @@ public class UserCourse implements Serializable {
     public UserCourse(User user, Course course) {
         this.user = user;
         this.course = course;
+        this.id = new UserCourseId(user.getUserId(), course.getCourseId());
     }
 
     @EmbeddedId
@@ -87,6 +88,14 @@ public class UserCourse implements Serializable {
 
     public void setGmtLastModify(Timestamp gmtLastModify) {
         this.gmtLastModify = gmtLastModify;
+    }
+
+    public UserCourseId getId() {
+        return id;
+    }
+
+    public void setId(UserCourseId id) {
+        this.id = id;
     }
 
     @Override

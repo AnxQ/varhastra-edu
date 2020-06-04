@@ -4,7 +4,12 @@ public class GroupException extends BaseException{
     public enum Type {
         GROUP_NOT_FIND,
         CONDITION_INVALID,
-        PERMISSION_DENIED
+        PERMISSION_DENIED,
+
+        USER_EXIST,
+        USER_NOT_INSIDE
+
+
     }
 
     public GroupException(GroupException.Type t) { super(t.name()); }

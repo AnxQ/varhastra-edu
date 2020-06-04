@@ -46,7 +46,7 @@ public class Comment {
     @OneToMany(mappedBy = "replyComment", cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<Comment> replyList;
 
-    @ManyToOne(cascade = {CascadeType.REMOVE, CascadeType.MERGE})
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "course_id")
     private Course course;
 

@@ -9,10 +9,14 @@ import top.varhastra.edu.Dao.*;
 import top.varhastra.edu.Entity.*;
 import top.varhastra.edu.Entity.Enum.UserRole;
 import top.varhastra.edu.Entity.Enum.UserState;
+import top.varhastra.edu.Graphql.execptions.UserException;
+import top.varhastra.edu.Graphql.execptions.UserException.Type;
+
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,11 +48,11 @@ public class UserService {
     public User register(String name,
                            String password,
                            long majorId,
-                           String mail) throws Exception {
+                           String mail) throws UserException {
         if (isMailExist(mail))
-            throw new Exception("mail");
+            throw new UserException(Type.FIELD_INVALID, "mail");
         if (isNameExist(name))
-            throw new Exception("name");
+            throw new UserException(Type.FIELD_INVALID, "name");
         User user = new User();
         user.setName(name);
         user.setPassword(password);
@@ -90,6 +94,22 @@ public class UserService {
         user.setPhone(phone);
         user.setGender(gender);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public boolean deleteUser(Long userId, User opUser) {
+        if (!opUser.getRole().equals(UserRole.GM))
+            if (opUser.getUserId() == userId) {
+                userRepository.delete(opUser);
+                return true;
+            }
+            else
+                throw new UserException(Type.PERMISSION_DENIED);
+        User user = userRepository.findByUserId(userId);
+        if (Objects.isNull(user))
+            throw new UserException(Type.USER_NOT_FIND);
+        userRepository.delete(user);
+        return false;
     }
 
     public Department getUserDepartment(User user) {

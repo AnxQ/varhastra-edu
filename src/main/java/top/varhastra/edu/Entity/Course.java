@@ -63,16 +63,16 @@ public class Course {
     @Column(name="course_state")
     private CourseState state;
 
-    @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private List<Courseware> coursewares;
 
     @Column(name="organize")
     private String organize;
 
-    @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Set<UserCourse> users;
 
     public String getTitle() {

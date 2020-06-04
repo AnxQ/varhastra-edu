@@ -2,22 +2,19 @@ package top.varhastra.edu.Service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import top.varhastra.edu.Dao.CourseRepository;
-import top.varhastra.edu.Dao.CoursewareRepository;
-import top.varhastra.edu.Dao.UserCourseRepository;
-import top.varhastra.edu.Dao.UserRepository;
+import top.varhastra.edu.Dao.*;
 import top.varhastra.edu.Entity.*;
 import top.varhastra.edu.Entity.Enum.CoursePrivilege;
-import top.varhastra.edu.Entity.Enum.GroupPrivilege;
 import top.varhastra.edu.Entity.Enum.UserRole;
+import top.varhastra.edu.Entity.Enum.UserState;
+import top.varhastra.edu.Graphql.execptions.CourseException;
+import top.varhastra.edu.Graphql.execptions.CourseException.Type;
 
 import javax.annotation.Resource;
-import javax.persistence.RollbackException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +25,8 @@ public class CourseService {
     private UserRepository userRepository;
     @Resource
     private CoursewareRepository coursewareRepository;
+    @Resource
+    private CommentRepository commentRepository;
     @Resource
     private UserCourseRepository userCourseRepository;
 
@@ -44,7 +43,7 @@ public class CourseService {
         return userCourse != null &&
                 (userCourse.getCoursePrivilege() == CoursePrivilege.ASSISTANT ||
                         userCourse.getCoursePrivilege() == CoursePrivilege.TEACHER ||
-                        userCourse.getUser().getRole().equals("GM"));
+                        userCourse.getUser().getRole().equals(UserRole.GM));
     }
 
     public Course getCourse(long courseId) {
@@ -52,10 +51,10 @@ public class CourseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void joinCourse(List<Long> userIds, long courseId) throws Exception {
+    public void joinCourse(List<Long> userIds, long courseId) throws CourseException {
         Course course = courseRepository.findByCourseId(courseId);
         if (course == null)
-            throw new Exception(String.format("Course %s not exist", courseId));
+            throw new CourseException(Type.COURSE_NOT_FIND);
         course.getUsers().addAll(userIds.stream()
                 .map(userRepository::findByUserId)
                 .filter(Objects::nonNull)
@@ -65,33 +64,58 @@ public class CourseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void kickCourse(List<Long> userIds, long courseId, User opUser) throws Exception {
+    public void leaveCourse(List<Long> userIds, long courseId, User opUser) throws CourseException {
         Course course = courseRepository.findByCourseId(courseId);
         if (course == null)
-            throw new Exception(String.format("Course %s not exist", courseId));
-        if (!adminCourse(opUser, course))
-            throw new Exception("Permission Denied.");
-        course.getUsers().removeAll(userIds.stream()
-                .map(userId -> userCourseRepository.findByUserIdAndCourseId(userId, courseId))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
-        courseRepository.save(course);
+            throw new CourseException(Type.COURSE_NOT_FIND);
+        if (!adminCourse(opUser, course) && !isUserInCourse(opUser, course))
+            throw new CourseException(Type.PERMISSION_DENIED);
+        userCourseRepository.deleteAll(
+                userCourseRepository.findAllByUserIdsAndCourseId(userIds, courseId));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void setAssistant(List<Long> userIds, long courseId, User opUser) throws Exception {
         Course course = courseRepository.findByCourseId(courseId);
         if (course == null)
-            throw new Exception(String.format("Course %s not exist", courseId));
+            throw new CourseException(Type.COURSE_NOT_FIND);
         if (!adminCourse(opUser, course))
-            throw new Exception("Permission Denied.");
-        course.getUsers().addAll(userIds.stream()
-                .map(userId -> userCourseRepository.findByUserIdAndCourseId(userId, courseId))
+            throw new CourseException(Type.PERMISSION_DENIED);
+        course.getUsers().addAll(
+                userCourseRepository.findAllByUserIdsAndCourseId(userIds, courseId).stream()
                 .filter(userCourse -> Objects.nonNull(userCourse) &&
                         userCourse.getCoursePrivilege() != CoursePrivilege.TEACHER)
                 .peek(userCourse -> userCourse.setCoursePrivilege(CoursePrivilege.ASSISTANT))
                 .collect(Collectors.toList()));
         courseRepository.save(course);
+    }
+
+    @Transactional(rollbackFor = CourseException.class)
+    public void addComment(String details, Long replyTo, User opUser, long courseId) {
+        Course course = courseRepository.findByCourseId(courseId);
+        if (course == null)
+            throw new CourseException(Type.COURSE_NOT_FIND);
+        if (!isUserInCourse(opUser, course) || opUser.getUserState().equals(UserState.BANNED))
+            throw new CourseException(Type.PERMISSION_DENIED);
+        Comment comment = new Comment();
+        comment.setCourse(course);
+        comment.setDetails(details);
+        comment.setUser(opUser);
+        if (Objects.nonNull(replyTo))
+            comment.setReplyComment(
+                    commentRepository.findCommentByCommentIdAndCourse(replyTo, course));
+        course.getComments().add(comment);
+        courseRepository.save(course);
+    }
+
+    @Transactional(rollbackFor = CourseException.class)
+    public void removeComment(long commentId, User opUser) {
+        Comment comment = commentRepository.findByCommentId(commentId);
+        if (!Objects.nonNull(comment))
+            throw new CourseException(Type.COURSE_NOT_FIND);
+        if (!(adminCourse(opUser, comment.getCourse()) || comment.getUser().equals(opUser)))
+            throw new CourseException(Type.PERMISSION_DENIED);
+        commentRepository.delete(comment);
     }
 
     @Transactional
