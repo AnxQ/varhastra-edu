@@ -25,7 +25,7 @@ public class User {
     private long userId;
 
     @NotNull
-    @ManyToOne(cascade={CascadeType.DETACH})
+    @ManyToOne(cascade={CascadeType.DETACH}, fetch = FetchType.LAZY)
     @JoinColumn(name = "major_id")
     private Major major;
 

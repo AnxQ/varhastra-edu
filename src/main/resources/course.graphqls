@@ -33,8 +33,17 @@ type CourseInfo {
     state: Int
     cover: String
     title: String
+    teachers: [UserInfo]
+    assistants: [UserInfo]
     description: String
     organize: String
     coursewares: [CoursewareInfo]
     comments: [CommentInfo]
+    teach: Boolean
+}
+
+input CourseChangeInput {
+    type: String
+    userIds: [String]
+    courseId: String
 }

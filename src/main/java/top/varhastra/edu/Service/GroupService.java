@@ -23,12 +23,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
-    @Resource
-    GroupRepository groupRepository;
-    @Resource
-    UserRepository userRepository;
-    @Resource
-    UserGroupRepository userGroupRepository;
+    @Resource GroupRepository groupRepository;
+    @Resource UserRepository userRepository;
+    @Resource UserGroupRepository userGroupRepository;
 
     private final List<GroupPrivilege> admins =
             Arrays.asList(GroupPrivilege.ADMIN, GroupPrivilege.CREATOR);
@@ -55,7 +52,7 @@ public class GroupService {
                 .map(userRepository::findByUserId)
                 .filter(Objects::nonNull)
                 .map(user -> new UserGroup(user, group))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toSet()));
         groupRepository.save(group);
     }
 

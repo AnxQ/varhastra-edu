@@ -4,12 +4,14 @@ import graphql.kickstart.tools.GraphQLQueryResolver;
 import graphql.schema.DataFetchingEnvironment;
 import org.springframework.stereotype.Component;
 import top.varhastra.edu.Entity.Course;
+import top.varhastra.edu.Entity.Enum.CoursePrivilege;
 import top.varhastra.edu.Entity.User;
 import top.varhastra.edu.Entity.UserCourse;
 import top.varhastra.edu.Graphql.execptions.CourseException;
 import top.varhastra.edu.Graphql.types.CourseInfo;
 import top.varhastra.edu.Graphql.types.CourseInfoResult;
 import top.varhastra.edu.Graphql.types.ManyCourseInfoResult;
+import top.varhastra.edu.Graphql.types.UserInfo;
 import top.varhastra.edu.Service.CourseService;
 import top.varhastra.edu.Service.UserService;
 import top.varhastra.edu.Graphql.execptions.CourseException.Type;
@@ -30,7 +32,12 @@ public class CourseQuery implements GraphQLQueryResolver {
         Course course = courseService.getCourse(Long.parseLong(courseId));
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
-        return new CourseInfo(course, true);
+        CourseInfo courseInfo = new CourseInfo(course, true);
+        courseInfo.setAssistants(courseService.getAssistants(course)
+                .map(UserInfo::new).collect(Collectors.toList()));
+        courseInfo.setTeachers(courseService.getTeachers(course)
+                .map(UserInfo::new).collect(Collectors.toList()));
+        return courseInfo;
     }
 
     public List<CourseInfo> courses(String userId, DataFetchingEnvironment environment) {
@@ -41,8 +48,12 @@ public class CourseQuery implements GraphQLQueryResolver {
             throw new CourseException(Type.PERMISSION_DENIED);
         return queryUser.getCourses()
                         .stream()
-                        .map(UserCourse::getCourse)
-                        .map(CourseInfo::new)
+                        .map(userCourse -> {
+                            CourseInfo courseInfo = new CourseInfo(userCourse.getCourse());
+                            if (userCourse.getCoursePrivilege().equals(CoursePrivilege.TEACHER))
+                                courseInfo.setTeach(true);
+                            return courseInfo;
+                        })
                         .collect(Collectors.toList());
     }
 }

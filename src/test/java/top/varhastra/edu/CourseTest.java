@@ -34,7 +34,7 @@ class CourseTest {
     @Resource
     private UserService userService;
 
-
+    @Test
     void addAndDeleteTest() {
         for (int i = 1; i < 10; ++i) {
             Course course = new Course();
@@ -60,17 +60,17 @@ class CourseTest {
     void joinAndKickTest() throws Exception {
         long courseId = 10;
         User opUser = userService.getUserById(20);
-        courseService.joinCourse(Arrays.asList(1L, 2L), courseId);
+        courseService.joinCourse(Arrays.asList(1L, 2L), courseId, opUser);
         courseService.setAssistant(Arrays.asList(1L, 2L), courseId, opUser);
         courseService.leaveCourse(Arrays.asList(1L, 2L), courseId, opUser);
     }
 
     @Test
     void commentTest() {
-        long courseId = 10000;
-        long userId = 114514;
-        User opUser = userService.getUserById(114514);
-        courseService.joinCourse(Collections.singletonList(userId), courseId);
+        long courseId = 28;
+        long userId = 1;
+        User opUser = userService.getUserById(userId);
+        courseService.joinCourse(Collections.singletonList(userId), courseId, opUser);
         Course course = courseService.getCourse(courseId);
         courseService.addComment("TestComment1", null, opUser, courseId);
         System.out.println(course.getComments());
@@ -78,4 +78,6 @@ class CourseTest {
         System.out.println(course.getComments());
         courseService.leaveCourse(Collections.singletonList(userId), courseId, opUser);
     }
+
+
 }

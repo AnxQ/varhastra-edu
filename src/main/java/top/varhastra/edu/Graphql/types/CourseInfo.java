@@ -18,8 +18,11 @@ public class CourseInfo {
     String title;
     Integer state;
     String organize;
+    List<UserInfo> teachers;
+    List<UserInfo> assistants;
     List<CoursewareInfo> coursewares;
     List<CommentInfo> comments;
+    Boolean teach;
 
     public CourseInfo(Course course) {
         this(course, false);
@@ -40,6 +43,30 @@ public class CourseInfo {
             this.coursewares = course.getCoursewares().stream().map(CoursewareInfo::new).collect(Collectors.toList());
             this.comments = course.getComments().stream().map(CommentInfo::new).collect(Collectors.toList());
         }
+    }
+
+    public Boolean getTeach() {
+        return teach;
+    }
+
+    public void setTeach(Boolean teach) {
+        this.teach = teach;
+    }
+
+    public void setTeachers(List<UserInfo> teachers) {
+        this.teachers = teachers;
+    }
+
+    public void setAssistants(List<UserInfo> assistants) {
+        this.assistants = assistants;
+    }
+
+    public List<UserInfo> getTeachers() {
+        return teachers;
+    }
+
+    public List<UserInfo> getAssistants() {
+        return assistants;
     }
 
     public String getCourseId() {

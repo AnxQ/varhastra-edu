@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 
 public class Utils {
     public static String formatTime(Timestamp timestamp) {
-        return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(timestamp);
+        return new SimpleDateFormat("yyyy/MM/dd").format(timestamp);
     }
 
     public static boolean adminGroup(UserGroup userGroup) {

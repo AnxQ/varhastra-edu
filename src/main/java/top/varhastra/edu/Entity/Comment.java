@@ -20,7 +20,7 @@ public class Comment {
     long commentId;
 
     @NotNull
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.DETACH)
     @JoinColumn(name = "user_id")
     private User user;
 

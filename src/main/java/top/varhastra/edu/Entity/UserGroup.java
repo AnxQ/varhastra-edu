@@ -17,8 +17,9 @@ import java.util.Objects;
 public class UserGroup implements Serializable {
     public UserGroup() {}
     public UserGroup(User user, Group group) {
-        this.id = new UserGroupId(user.getUserId(), group.getGroupId());
         this.user = user;
+        this.group = group;
+        this.id = new UserGroupId(user.getUserId(), group.getGroupId());
     }
 
     @EmbeddedId
@@ -36,12 +37,12 @@ public class UserGroup implements Serializable {
     @ManyToOne
     private Group group;
 
-    @NotEmpty
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name="previl")
     private GroupPrivilege groupPrivilege = GroupPrivilege.MEMBER;
 
-    @NotEmpty
+    @NotNull
     @Column(name="gmt_join")
     @CreatedDate
     private Timestamp gmtJoin;

@@ -10,6 +10,7 @@ import top.varhastra.edu.Entity.Enum.UserRole;
 import top.varhastra.edu.Entity.Enum.UserState;
 import top.varhastra.edu.Graphql.execptions.CourseException;
 import top.varhastra.edu.Graphql.execptions.CourseException.Type;
+import top.varhastra.edu.Graphql.execptions.GroupException;
 
 import javax.annotation.Resource;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class CourseService {
@@ -54,10 +56,13 @@ public class CourseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void joinCourse(List<Long> userIds, long courseId) throws CourseException {
+    public void joinCourse(List<Long> userIds, long courseId, User opUser) throws CourseException {
         Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
+        if (!adminCourse(opUser, course) ||
+                userIds.size() == 1 && userIds.get(0).equals(opUser.getUserId()))
+            throw new GroupException(GroupException.Type.PERMISSION_DENIED);
         course.getUsers().addAll(userIds.stream()
                 .map(userRepository::findByUserId)
                 .filter(Objects::nonNull)
@@ -127,7 +132,7 @@ public class CourseService {
         if (!adminCourse(opUser, course))
             throw new CourseException(Type.PERMISSION_DENIED);
         Group group = new Group();
-        group.setName(course.getTitle() + "群");
+        group.setName(course.getTitle() + " 课程群");
         group.setUsers(course.getUsers().stream()
                 .map( user -> {
                     UserGroup userGroup = new UserGroup(user.getUser(), group);
@@ -135,15 +140,27 @@ public class CourseService {
                             user.getCoursePrivilege().equals(CoursePrivilege.TEACHER) ?
                                     GroupPrivilege.CREATOR : GroupPrivilege.MEMBER);
                     return userGroup;
-                }).collect(Collectors.toList()));
+                }).collect(Collectors.toSet()));
         course.setGroup(group);
         groupRepository.save(group);
         courseRepository.save(course);
     }
 
+    public Stream<User> getTeachers(Course course) {
+        return course.getUsers().stream()
+                .filter(userCourse -> userCourse.getCoursePrivilege().equals(CoursePrivilege.TEACHER))
+                .map(UserCourse::getUser);
+    }
+
+    public Stream<User> getAssistants(Course course) {
+        return course.getUsers().stream()
+                .filter(userCourse -> userCourse.getCoursePrivilege().equals(CoursePrivilege.ASSISTANT))
+                .map(UserCourse::getUser);
+    }
+
     @Transactional
     public void createCourse () {
-        
+
     }
 
 }

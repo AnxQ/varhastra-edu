@@ -5,6 +5,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -18,8 +19,8 @@ public class Group {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "group", cascade = { CascadeType.REMOVE })
-    private List<UserGroup> users;
+    @OneToMany(mappedBy = "group", cascade = { CascadeType.REMOVE, CascadeType.MERGE })
+    private Set<UserGroup> users;
 
     public String getName() {
         return name;
@@ -29,11 +30,11 @@ public class Group {
         this.name = name;
     }
 
-    public List<UserGroup> getUsers() {
+    public Set<UserGroup> getUsers() {
         return users;
     }
 
-    public void setUsers(List<UserGroup> users) {
+    public void setUsers(Set<UserGroup> users) {
         this.users = users;
     }
 

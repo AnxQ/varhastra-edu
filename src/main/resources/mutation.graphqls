@@ -3,6 +3,10 @@ type Mutation {
     register(input: RegisterInput): AuthResult
     login(input: LoginInput): AuthResult
     logout: BaseResult
+
+    courseChange(input: CourseChangeInput): BaseResult
+    groupChange(input: GroupChangeInput): BaseResult
+
 }
 
 type AuthResult {

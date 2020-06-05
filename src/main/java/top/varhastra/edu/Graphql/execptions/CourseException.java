@@ -14,7 +14,7 @@ public class CourseException extends BaseException{
         CONDITION_INVALID,
         PERMISSION_DENIED,
         DUPLICATED_ENROLL,
-        USER_NOT_INSIDE
+        USER_NOT_INSIDE,
     }
 
     public CourseException(CourseException.Type t) { super(t.name()); }

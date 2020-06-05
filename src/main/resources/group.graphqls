@@ -25,3 +25,9 @@ type ManyGroupInfoResult {
     message: String
     groups: [GroupInfo]
 }
+
+input GroupChangeInput {
+    type: String
+    userIds: [String]
+    groupId: String
+}
