@@ -16,10 +16,9 @@ import java.nio.file.Paths;
 @RestController
 @RequestMapping("/media")
 public class MediaController {
-    @Resource
-    private MediaResource mediaResource;
+    @Resource private MediaResource mediaResource;
 
-    @GetMapping("/{resourceId}")
+    @GetMapping("/video/{resourceId}")
     public void video(
             @PathVariable("resourceId") Long resourceId,
             @RequestParam("type") String type,
