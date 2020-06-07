@@ -10,6 +10,7 @@ import java.util.Map;
 public class CourseException extends BaseException{
     public enum Type {
         COURSE_NOT_FIND,
+        COMMENT_NOT_FIND,
         FIELD_INVALID,
         CONDITION_INVALID,
         PERMISSION_DENIED,

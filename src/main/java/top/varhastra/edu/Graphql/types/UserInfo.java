@@ -1,13 +1,7 @@
 package top.varhastra.edu.Graphql.types;
 
-import top.varhastra.edu.Entity.Department;
-import top.varhastra.edu.Entity.Major;
 import top.varhastra.edu.Entity.User;
 import top.varhastra.edu.Utils.Utils;
-
-import javax.rmi.CORBA.Util;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 public class UserInfo {
     private String userId;
@@ -35,7 +29,7 @@ public class UserInfo {
         this.avatar = user.getAvatar();
         this.department = new DepartmentInfo(user.getMajor().getDepart());
         this.major = new MajorInfo(user.getMajor());
-        this.joinDate = Utils.formatTime(user.getGmtCreated());
+        this.joinDate = Utils.formatDate(user.getGmtCreated());
         this.motto = user.getMotto();
         this.role = user.getRole().ordinal();
         if (addDetails) {

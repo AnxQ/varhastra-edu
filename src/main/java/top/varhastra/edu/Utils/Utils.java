@@ -7,12 +7,17 @@ import top.varhastra.edu.Entity.User;
 import top.varhastra.edu.Entity.UserCourse;
 import top.varhastra.edu.Entity.UserGroup;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 public class Utils {
-    public static String formatTime(Timestamp timestamp) {
+    public static String formatDate(Timestamp timestamp) {
         return new SimpleDateFormat("yyyy/MM/dd").format(timestamp);
+    }
+
+    public static String formatTime(Timestamp timestamp) {
+        return new SimpleDateFormat("yyyy/MM/dd HH:mm").format(timestamp);
     }
 
     public static boolean adminGroup(UserGroup userGroup) {

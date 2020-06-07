@@ -23,6 +23,9 @@ public class Courseware {
     @Column(name = "name")
     String name;
 
+    @Column(name = "thumbnail")
+    String thumbnail;
+
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "type")
     CoursewareType type;
@@ -84,6 +87,14 @@ public class Courseware {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }
 

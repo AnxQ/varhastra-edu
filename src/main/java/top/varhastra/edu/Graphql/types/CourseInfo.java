@@ -1,6 +1,5 @@
 package top.varhastra.edu.Graphql.types;
 
-import com.alibaba.fastjson.JSON;
 import top.varhastra.edu.Entity.Course;
 import top.varhastra.edu.Utils.Utils;
 
@@ -23,6 +22,11 @@ public class CourseInfo {
     List<CoursewareInfo> coursewares;
     List<CommentInfo> comments;
     Boolean teach;
+    Boolean joined;
+    List<TagInfo> tags;
+    Integer userCount;
+    Long sentiGood;
+    Number sentiAvg;
 
     public CourseInfo(Course course) {
         this(course, false);
@@ -34,15 +38,44 @@ public class CourseInfo {
         this.cover = course.getCover();
         this.liveId = course.getLiveId();
         this.description = course.getDescription();
-        this.timeOpen = Utils.formatTime(course.getGmtOpen());
-        this.timeClose = Utils.formatTime(course.getGmtClose());
+        this.timeOpen = Utils.formatDate(course.getGmtOpen());
+        this.timeClose = Utils.formatDate(course.getGmtClose());
         this.state = course.getState().ordinal();
         this.title = course.getTitle();
         if (addDetails) {
             this.organize = course.getOrganize();
             this.coursewares = course.getCoursewares().stream().map(CoursewareInfo::new).collect(Collectors.toList());
             this.comments = course.getComments().stream().map(CommentInfo::new).collect(Collectors.toList());
+            this.tags = course.getTags().stream().map(TagInfo::new).collect(Collectors.toList());
+            this.userCount = course.getUsers().size();
+            this.sentiGood = course.getSentiGood();
+            this.sentiAvg = course.getSentiCount() == 0 ? 0 :
+                    (course.getSentiSum() / course.getSentiCount().doubleValue());
         }
+    }
+
+    public void setJoined(Boolean joined) {
+        this.joined = joined;
+    }
+
+    public Boolean getJoined() {
+        return joined;
+    }
+
+    public List<TagInfo> getTags() {
+        return tags;
+    }
+
+    public Integer getUserCount() {
+        return userCount;
+    }
+
+    public Long getSentiGood() {
+        return sentiGood;
+    }
+
+    public Number getSentiAvg() {
+        return sentiAvg;
     }
 
     public Boolean getTeach() {

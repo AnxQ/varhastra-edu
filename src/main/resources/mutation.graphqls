@@ -7,6 +7,7 @@ type Mutation {
     courseChange(input: CourseChangeInput): BaseResult
     groupChange(input: GroupChangeInput): BaseResult
 
+    commentChange(input: CommentInput): BaseResult
 }
 
 type AuthResult {

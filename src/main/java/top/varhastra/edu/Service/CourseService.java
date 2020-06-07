@@ -99,7 +99,7 @@ public class CourseService {
     }
 
     @Transactional(rollbackFor = CourseException.class)
-    public void addComment(String details, Long replyTo, User opUser, long courseId) {
+    public void addComment(String details, User opUser, long courseId) {
         Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
@@ -109,18 +109,42 @@ public class CourseService {
         comment.setCourse(course);
         comment.setDetails(details);
         comment.setUser(opUser);
-        if (Objects.nonNull(replyTo))
-            comment.setReplyComment(
-                    commentRepository.findCommentByCommentIdAndCourse(replyTo, course));
         course.getComments().add(comment);
         courseRepository.save(course);
     }
 
     @Transactional(rollbackFor = CourseException.class)
+    public void addComment(String details, User opUser, long courseId, Long replyTo) {
+        Course course = getCourse(courseId);
+        if (course == null)
+            throw new CourseException(Type.COURSE_NOT_FIND);
+        if (!isUserInCourse(opUser, course) || opUser.getUserState().equals(UserState.BANNED))
+            throw new CourseException(Type.PERMISSION_DENIED);
+        Comment comment = new Comment();
+        comment.setReplyComment(commentRepository.findCommentByCommentIdAndCourse(replyTo, course));
+        comment.setCourse(course);
+        comment.setDetails(details);
+        comment.setUser(opUser);
+        course.getComments().add(comment);
+        courseRepository.save(course);
+    }
+
+    @Transactional
+    public void editComment(String details, User opUser, long commentId) {
+        Comment comment = commentRepository.findByCommentId(commentId);
+        if (Objects.isNull(comment))
+            throw new CourseException(Type.COMMENT_NOT_FIND);
+        if (!comment.getUser().equals(opUser))
+            throw new CourseException(Type.PERMISSION_DENIED);
+        comment.setDetails(details);
+        commentRepository.save(comment);
+    }
+
+    @Transactional(rollbackFor = CourseException.class)
     public void removeComment(long commentId, User opUser) {
         Comment comment = commentRepository.findByCommentId(commentId);
-        if (!Objects.nonNull(comment))
-            throw new CourseException(Type.COURSE_NOT_FIND);
+        if (Objects.isNull(comment))
+            throw new CourseException(Type.COMMENT_NOT_FIND);
         if (!(adminCourse(opUser, comment.getCourse()) || comment.getUser().equals(opUser)))
             throw new CourseException(Type.PERMISSION_DENIED);
         commentRepository.delete(comment);
@@ -161,6 +185,20 @@ public class CourseService {
     @Transactional
     public void createCourse () {
 
+    }
+
+    @Transactional
+    public void addSentiment(int score, Long courseId) {
+        Course course = getCourse(courseId);
+        if (course == null)
+            throw new CourseException(Type.COURSE_NOT_FIND);
+        if (score > 5)
+            throw new CourseException(Type.FIELD_INVALID, "score");
+        course.setSentiCount(course.getSentiCount() + 1);
+        course.setSentiSum(course.getSentiSum() + score);
+        if (score > 3)
+            course.setSentiGood(course.getSentiGood() + 1);
+        courseRepository.save(course);
     }
 
 }

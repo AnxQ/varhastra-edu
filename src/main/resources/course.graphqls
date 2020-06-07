@@ -11,6 +11,7 @@ type ManyCourseInfoResult {
 type CoursewareInfo {
     coursewareId: String
     name: String
+    thumbnail: String
     type: Int
     timeCreate: String
     timeModified: String
@@ -23,6 +24,11 @@ type CommentInfo {
     timeCreate: String
     timeModified: String
     replyTo: String
+}
+
+type TagInfo {
+    tagId: String
+    name: String
 }
 
 type CourseInfo {
@@ -39,11 +45,23 @@ type CourseInfo {
     organize: String
     coursewares: [CoursewareInfo]
     comments: [CommentInfo]
+    tags: [TagInfo]
     teach: Boolean
+    joined: Boolean
+    userCount: Int
+    sentiGood: Int
+    sentiAvg: Float
 }
 
 input CourseChangeInput {
     type: String
     userIds: [String]
     courseId: String
+}
+
+input CommentInput {
+    commentId: String
+    details: String
+    courseId: String
+    replyTo: String
 }

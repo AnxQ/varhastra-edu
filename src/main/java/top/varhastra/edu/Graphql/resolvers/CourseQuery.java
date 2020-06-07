@@ -28,7 +28,7 @@ public class CourseQuery implements GraphQLQueryResolver {
     @Resource
     private UserService userService;
 
-    public CourseInfo course(String courseId) {
+    public CourseInfo course(String courseId, DataFetchingEnvironment environment) {
         Course course = courseService.getCourse(Long.parseLong(courseId));
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
@@ -37,6 +37,7 @@ public class CourseQuery implements GraphQLQueryResolver {
                 .map(UserInfo::new).collect(Collectors.toList()));
         courseInfo.setTeachers(courseService.getTeachers(course)
                 .map(UserInfo::new).collect(Collectors.toList()));
+        courseInfo.setJoined(courseService.isUserInCourse(userService.getCurrentUser(environment), course));
         return courseInfo;
     }
 

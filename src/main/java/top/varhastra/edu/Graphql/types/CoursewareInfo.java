@@ -10,6 +10,7 @@ public class CoursewareInfo {
     Integer type;
     String timeCreate;
     String timeModified;
+    String thumbnail;
 
     public CoursewareInfo(Courseware courseware) {
         this.coursewareId = Long.toString(courseware.getCoursewareId());
@@ -17,6 +18,11 @@ public class CoursewareInfo {
         this.type = courseware.getType().ordinal();
         this.timeCreate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(courseware.getGmtCreated());
         this.timeModified = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(courseware.getGmtCreated());
+        this.thumbnail = courseware.getThumbnail();
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
     }
 
     public String getCoursewareId() {

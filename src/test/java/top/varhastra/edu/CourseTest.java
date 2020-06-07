@@ -72,7 +72,7 @@ class CourseTest {
         User opUser = userService.getUserById(userId);
         courseService.joinCourse(Collections.singletonList(userId), courseId, opUser);
         Course course = courseService.getCourse(courseId);
-        courseService.addComment("TestComment1", null, opUser, courseId);
+        courseService.addComment("TestComment1", opUser, courseId);
         System.out.println(course.getComments());
         courseService.removeComment(course.getComments().get(0).getCommentId(), opUser);
         System.out.println(course.getComments());

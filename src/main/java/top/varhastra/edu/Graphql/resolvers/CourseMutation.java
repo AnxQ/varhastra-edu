@@ -8,11 +8,13 @@ import top.varhastra.edu.Graphql.execptions.CourseException;
 import top.varhastra.edu.Graphql.execptions.CourseException.Type;
 
 import top.varhastra.edu.Graphql.types.BaseResult;
+import top.varhastra.edu.Graphql.types.CommentInput;
 import top.varhastra.edu.Graphql.types.CourseChangeInput;
 import top.varhastra.edu.Service.CourseService;
 import top.varhastra.edu.Service.UserService;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,6 +35,32 @@ public class CourseMutation implements GraphQLMutationResolver {
                     courseId, opUser);
         else
             throw new CourseException(Type.CONDITION_INVALID);
+        return new BaseResult("success");
+    }
+
+    public BaseResult commentChange(CommentInput input, DataFetchingEnvironment environment) {
+        User opUser = userService.getCurrentUser(environment);
+        long courseId = Long.parseLong(input.getCourseId());
+        if (!input.getCommentId().isEmpty()) {
+            if (input.getDetails().isEmpty())
+                courseService.removeComment(Long.parseLong(input.getCommentId()), opUser);
+            else
+                courseService.editComment(input.getDetails(), opUser, Long.parseLong(input.getCommentId()));
+        } else {
+            if (Objects.isNull(input.getReplyTo()))
+                courseService.addComment(
+                        input.getDetails(),
+                        opUser,
+                        Long.parseLong(input.getCourseId())
+                );
+            else
+                courseService.addComment(
+                        input.getDetails(),
+                        opUser,
+                        Long.parseLong(input.getCourseId()),
+                        Long.parseLong(input.getReplyTo())
+                );
+        }
         return new BaseResult("success");
     }
 }

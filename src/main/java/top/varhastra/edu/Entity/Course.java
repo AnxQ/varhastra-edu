@@ -2,7 +2,6 @@ package top.varhastra.edu.Entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,11 +10,8 @@ import top.varhastra.edu.Entity.Enum.CourseState;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -46,6 +42,18 @@ public class Course {
     @Column(name="cover")
     private String cover;
 
+    @NotNull
+    @Column(name="senti_sum")
+    private long sentiSum = 0;
+
+    @NotNull
+    @Column(name="senti_good")
+    private long sentiGood = 0;
+
+    @NotNull
+    @Column(name="senti_count")
+    private long sentiCount = 0;
+
     @NotEmpty
     @Column(name="title")
     private String title;
@@ -62,6 +70,12 @@ public class Course {
     @Enumerated(EnumType.STRING)
     @Column(name="course_state")
     private CourseState state;
+
+    @JoinTable(name="CourseTag",
+            joinColumns={@JoinColumn(name="course_id", referencedColumnName="course_id")},
+            inverseJoinColumns={@JoinColumn(name="tag_id", referencedColumnName="tag_id")})
+    @ManyToMany
+    private Set<Tag> tags;
 
     @OneToMany(mappedBy = "course", cascade = {CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<Comment> comments;
@@ -177,6 +191,38 @@ public class Course {
 
     public void setUsers(Set<UserCourse> users) {
         this.users = users;
+    }
+
+    public long getSentiSum() {
+        return sentiSum;
+    }
+
+    public void setSentiSum(long snetiSum) {
+        this.sentiSum = snetiSum;
+    }
+
+    public long getSentiGood() {
+        return sentiGood;
+    }
+
+    public void setSentiGood(long sentiGood) {
+        this.sentiGood = sentiGood;
+    }
+
+    public Long getSentiCount() {
+        return sentiCount;
+    }
+
+    public void setSentiCount(long sentiCount) {
+        this.sentiCount = sentiCount;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override
