@@ -11,6 +11,7 @@ type Query {
 
     course(id: String!): CourseInfo
     courses(userId: String): [CourseInfo]
+    comments(courseId: String): [CommentInfo]
 
     group(id: String!): GroupInfo
     groups(userId: String): [GroupInfo]

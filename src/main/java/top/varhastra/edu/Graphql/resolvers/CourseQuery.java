@@ -8,10 +8,7 @@ import top.varhastra.edu.Entity.Enum.CoursePrivilege;
 import top.varhastra.edu.Entity.User;
 import top.varhastra.edu.Entity.UserCourse;
 import top.varhastra.edu.Graphql.execptions.CourseException;
-import top.varhastra.edu.Graphql.types.CourseInfo;
-import top.varhastra.edu.Graphql.types.CourseInfoResult;
-import top.varhastra.edu.Graphql.types.ManyCourseInfoResult;
-import top.varhastra.edu.Graphql.types.UserInfo;
+import top.varhastra.edu.Graphql.types.*;
 import top.varhastra.edu.Service.CourseService;
 import top.varhastra.edu.Service.UserService;
 import top.varhastra.edu.Graphql.execptions.CourseException.Type;
@@ -56,5 +53,12 @@ public class CourseQuery implements GraphQLQueryResolver {
                             return courseInfo;
                         })
                         .collect(Collectors.toList());
+    }
+
+    public List<CommentInfo> comments(String courseId) {
+        return courseService.getComments(Long.parseLong(courseId))
+                .stream()
+                .map(CommentInfo::new)
+                .collect(Collectors.toList());
     }
 }

@@ -10,6 +10,7 @@ import top.varhastra.edu.Graphql.execptions.CourseException.Type;
 import top.varhastra.edu.Graphql.types.BaseResult;
 import top.varhastra.edu.Graphql.types.CommentInput;
 import top.varhastra.edu.Graphql.types.CourseChangeInput;
+import top.varhastra.edu.Graphql.types.ScoreInput;
 import top.varhastra.edu.Service.CourseService;
 import top.varhastra.edu.Service.UserService;
 
@@ -47,20 +48,22 @@ public class CourseMutation implements GraphQLMutationResolver {
             else
                 courseService.editComment(input.getDetails(), opUser, Long.parseLong(input.getCommentId()));
         } else {
-            if (Objects.isNull(input.getReplyTo()))
-                courseService.addComment(
-                        input.getDetails(),
-                        opUser,
-                        Long.parseLong(input.getCourseId())
-                );
-            else
-                courseService.addComment(
-                        input.getDetails(),
-                        opUser,
-                        Long.parseLong(input.getCourseId()),
-                        Long.parseLong(input.getReplyTo())
-                );
+            courseService.addComment(
+                    input.getDetails(),
+                    opUser,
+                    courseId,
+                    Objects.isNull(input.getReplyTo()) ?
+                            null : input.getReplyTo().isEmpty() ?
+                            null : Long.parseLong(input.getReplyTo())
+            );
         }
+        return new BaseResult("success");
+    }
+
+    public BaseResult score(ScoreInput input, DataFetchingEnvironment environment) {
+        User opUser = userService.getCurrentUser(environment);
+        Long courseId = Long.parseLong(input.getCourseId());
+        courseService.addSentiment(input.getScore(), courseId);
         return new BaseResult("success");
     }
 }

@@ -1,5 +1,6 @@
 package top.varhastra.edu.Controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -14,17 +15,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("/media")
+@RequestMapping("/video")
 public class MediaController {
     @Resource private MediaResource mediaResource;
+    @Value("${varhastra.video.path}")
+    public volatile String videoPath;
 
-    @GetMapping("/video/{resourceId}")
+    @GetMapping("/{resourceName}")
     public void video(
-            @PathVariable("resourceId") Long resourceId,
-            @RequestParam("type") String type,
+            @PathVariable("resourceName") String resourceName,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String resourcePath = MediaResource.mediaRoot +"media/" + resourceId + type;
+        String resourcePath = this.videoPath + resourceName;
         Path filePath = Paths.get(resourcePath);
         if (Files.exists(filePath)) {
             String mimeType = Files.probeContentType(filePath);

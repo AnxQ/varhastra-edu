@@ -65,3 +65,8 @@ input CommentInput {
     courseId: String
     replyTo: String
 }
+
+input ScoreInput {
+    courseId: String
+    score: Int
+}

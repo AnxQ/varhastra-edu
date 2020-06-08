@@ -1,5 +1,6 @@
 package top.varhastra.edu.Service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,6 @@ import java.nio.file.Path;
 @Service
 public class MediaResource extends ResourceHttpRequestHandler {
     public final static String ATTR_FILE = "NON-STATIC-FILE";
-    public final static String mediaRoot = ClassUtils.getDefaultClassLoader().getResource("").getPath().substring(1);
 
     @Override
     protected Resource getResource(HttpServletRequest request) {

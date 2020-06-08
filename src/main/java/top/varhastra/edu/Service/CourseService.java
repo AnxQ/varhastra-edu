@@ -1,6 +1,8 @@
 package top.varhastra.edu.Service;
 
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import top.varhastra.edu.Dao.*;
 import top.varhastra.edu.Entity.*;
@@ -99,21 +101,6 @@ public class CourseService {
     }
 
     @Transactional(rollbackFor = CourseException.class)
-    public void addComment(String details, User opUser, long courseId) {
-        Course course = getCourse(courseId);
-        if (course == null)
-            throw new CourseException(Type.COURSE_NOT_FIND);
-        if (!isUserInCourse(opUser, course) || opUser.getUserState().equals(UserState.BANNED))
-            throw new CourseException(Type.PERMISSION_DENIED);
-        Comment comment = new Comment();
-        comment.setCourse(course);
-        comment.setDetails(details);
-        comment.setUser(opUser);
-        course.getComments().add(comment);
-        courseRepository.save(course);
-    }
-
-    @Transactional(rollbackFor = CourseException.class)
     public void addComment(String details, User opUser, long courseId, Long replyTo) {
         Course course = getCourse(courseId);
         if (course == null)
@@ -121,7 +108,8 @@ public class CourseService {
         if (!isUserInCourse(opUser, course) || opUser.getUserState().equals(UserState.BANNED))
             throw new CourseException(Type.PERMISSION_DENIED);
         Comment comment = new Comment();
-        comment.setReplyComment(commentRepository.findCommentByCommentIdAndCourse(replyTo, course));
+        if(Objects.nonNull(replyTo))
+            comment.setReplyComment(commentRepository.findCommentByCommentIdAndCourse(replyTo, course));
         comment.setCourse(course);
         comment.setDetails(details);
         comment.setUser(opUser);
@@ -140,14 +128,19 @@ public class CourseService {
         commentRepository.save(comment);
     }
 
-    @Transactional(rollbackFor = CourseException.class)
+    @Transactional(rollbackFor = CourseException.class ,isolation = Isolation.SERIALIZABLE)
     public void removeComment(long commentId, User opUser) {
         Comment comment = commentRepository.findByCommentId(commentId);
         if (Objects.isNull(comment))
             throw new CourseException(Type.COMMENT_NOT_FIND);
         if (!(adminCourse(opUser, comment.getCourse()) || comment.getUser().equals(opUser)))
             throw new CourseException(Type.PERMISSION_DENIED);
-        commentRepository.delete(comment);
+        if ( comment.getReplyList().size() >= 1) {
+            comment.setDetails("[deleted]");
+            commentRepository.save(comment);
+        }
+        else
+            commentRepository.delete(comment);
     }
 
     @Transactional
@@ -188,7 +181,7 @@ public class CourseService {
     }
 
     @Transactional
-    public void addSentiment(int score, Long courseId) {
+    public void addSentiment(Integer score, Long courseId) {
         Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
@@ -199,6 +192,14 @@ public class CourseService {
         if (score > 3)
             course.setSentiGood(course.getSentiGood() + 1);
         courseRepository.save(course);
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public List<Comment> getComments(Long courseId) {
+        Course course = getCourse(courseId);
+        if (course == null)
+            throw new CourseException(Type.COURSE_NOT_FIND);
+        return course.getComments();
     }
 
 }
