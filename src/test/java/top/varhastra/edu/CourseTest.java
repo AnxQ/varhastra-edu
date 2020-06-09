@@ -61,7 +61,7 @@ class CourseTest {
         long courseId = 10;
         User opUser = userService.getUserById(20);
         courseService.joinCourse(Arrays.asList(1L, 2L), courseId, opUser);
-        courseService.setAssistant(Arrays.asList(1L, 2L), courseId, opUser);
+//        courseService.setAssistant(Arrays.asList(1L, 2L), courseId, opUser);
         courseService.leaveCourse(Arrays.asList(1L, 2L), courseId, opUser);
     }
 

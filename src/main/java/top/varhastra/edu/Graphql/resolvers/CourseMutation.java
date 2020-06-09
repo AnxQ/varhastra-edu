@@ -26,16 +26,30 @@ public class CourseMutation implements GraphQLMutationResolver {
     public BaseResult courseChange(CourseChangeInput input, DataFetchingEnvironment environment) {
         User opUser = userService.getCurrentUser(environment);
         long courseId = Long.parseLong(input.getCourseId());
-        if (input.getType().equals("join"))
-            courseService.joinCourse(
-                    input.getUserIds().stream().map(Long::parseLong).collect(Collectors.toList()),
-                    courseId, opUser);
-        else if (input.getType().equals("leave"))
-            courseService.joinCourse(
-                    input.getUserIds().stream().map(Long::parseLong).collect(Collectors.toList()),
-                    courseId, opUser);
-        else
-            throw new CourseException(Type.CONDITION_INVALID);
+        switch (input.getType()) {
+            case "join":
+                courseService.joinCourse(
+                        input.getUserIds().stream().map(Long::parseLong).collect(Collectors.toList()),
+                        courseId, opUser);
+                break;
+            case "leave":
+                courseService.leaveCourse(
+                        input.getUserIds().stream().map(Long::parseLong).collect(Collectors.toList()),
+                        courseId, opUser);
+                break;
+            case "grant":
+                courseService.setAssistant(
+                        input.getUserIds().stream().map(Long::parseLong).collect(Collectors.toList()),
+                        courseId, opUser, false);
+                break;
+            case "revoke":
+                courseService.setAssistant(
+                        input.getUserIds().stream().map(Long::parseLong).collect(Collectors.toList()),
+                        courseId, opUser, true);
+                break;
+            default:
+                throw new CourseException(Type.CONDITION_INVALID);
+        }
         return new BaseResult("success");
     }
 

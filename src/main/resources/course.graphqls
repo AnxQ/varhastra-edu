@@ -41,6 +41,7 @@ type CourseInfo {
     title: String
     teachers: [UserInfo]
     assistants: [UserInfo]
+    students: [UserInfo]
     description: String
     organize: String
     coursewares: [CoursewareInfo]
@@ -48,6 +49,7 @@ type CourseInfo {
     tags: [TagInfo]
     teach: Boolean
     joined: Boolean
+    admin: Boolean
     userCount: Int
     sentiGood: Int
     sentiAvg: Float

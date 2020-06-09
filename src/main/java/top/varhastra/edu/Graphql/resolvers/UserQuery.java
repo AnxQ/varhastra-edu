@@ -60,9 +60,11 @@ public class UserQuery implements GraphQLQueryResolver {
             result = userService.getUsersByGroupId(Long.parseLong(groupId));
         if (result == null)
             throw new UserException(UserException.Type.CONDITION_INVALID);
+        boolean forceDetailed =
+                opUser.getRole().equals(UserRole.GM) || opUser.getRole().equals(UserRole.TEACHER);
         return result
                 .stream()
-                .map(user -> new UserInfo(user, opUser.getRole().equals(UserRole.GM)))
+                .map(user -> new UserInfo(user, forceDetailed))
                 .collect(Collectors.toList());
     }
 

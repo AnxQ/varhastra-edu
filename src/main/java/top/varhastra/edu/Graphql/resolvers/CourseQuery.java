@@ -14,6 +14,7 @@ import top.varhastra.edu.Service.UserService;
 import top.varhastra.edu.Graphql.execptions.CourseException.Type;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ public class CourseQuery implements GraphQLQueryResolver {
     private UserService userService;
 
     public CourseInfo course(String courseId, DataFetchingEnvironment environment) {
+        User opUser = userService.getCurrentUser(environment);
         Course course = courseService.getCourse(Long.parseLong(courseId));
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
@@ -34,6 +36,14 @@ public class CourseQuery implements GraphQLQueryResolver {
                 .map(UserInfo::new).collect(Collectors.toList()));
         courseInfo.setTeachers(courseService.getTeachers(course)
                 .map(UserInfo::new).collect(Collectors.toList()));
+        if (courseService.adminCourse(opUser, course)) {
+            courseInfo.setStudents(courseService.getStudents(course)
+                    .map(UserInfo::new).collect(Collectors.toList()));
+            courseInfo.setAdmin(true);
+        } else {
+            courseInfo.setStudents(Collections.emptyList());
+            courseInfo.setAdmin(false);
+        }
         courseInfo.setJoined(courseService.isUserInCourse(userService.getCurrentUser(environment), course));
         return courseInfo;
     }

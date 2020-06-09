@@ -19,10 +19,12 @@ public class CourseInfo {
     String organize;
     List<UserInfo> teachers;
     List<UserInfo> assistants;
+    List<UserInfo> students;
     List<CoursewareInfo> coursewares;
     List<CommentInfo> comments;
     Boolean teach;
     Boolean joined;
+    Boolean admin;
     List<TagInfo> tags;
     Integer userCount;
     Long sentiGood;
@@ -54,8 +56,24 @@ public class CourseInfo {
         }
     }
 
+    public Boolean getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
+    }
+
     public void setJoined(Boolean joined) {
         this.joined = joined;
+    }
+
+    public void setStudents(List<UserInfo> students) {
+        this.students = students;
+    }
+
+    public List<UserInfo> getStudents() {
+        return students;
     }
 
     public Boolean getJoined() {

@@ -53,6 +53,17 @@ public class CourseService {
                         userCourse.getUser().getRole().equals(UserRole.GM));
     }
 
+    public boolean manageCourse(User opUser, Course course) {
+        if (opUser == null)
+            return false;
+        if (opUser.getRole() == UserRole.GM)
+            return true;
+        UserCourse userCourse = userCourseRepository.findByUserAndCourse(opUser, course);
+        return userCourse != null &&
+                (userCourse.getCoursePrivilege() == CoursePrivilege.TEACHER ||
+                        userCourse.getUser().getRole().equals(UserRole.GM));
+    }
+
     public Course getCourse(long courseId) {
         return courseRepository.findByCourseId(courseId);
     }
@@ -85,17 +96,18 @@ public class CourseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void setAssistant(List<Long> userIds, long courseId, User opUser) throws Exception {
+    public void setAssistant(List<Long> userIds, long courseId, User opUser, boolean revoke) {
         Course course = getCourse(courseId);
         if (course == null)
             throw new CourseException(Type.COURSE_NOT_FIND);
-        if (!adminCourse(opUser, course))
+        if (!manageCourse(opUser, course))
             throw new CourseException(Type.PERMISSION_DENIED);
         course.getUsers().addAll(
                 userCourseRepository.findAllByUserIdsAndCourseId(userIds, courseId).stream()
                 .filter(userCourse -> Objects.nonNull(userCourse) &&
                         userCourse.getCoursePrivilege() != CoursePrivilege.TEACHER)
-                .peek(userCourse -> userCourse.setCoursePrivilege(CoursePrivilege.ASSISTANT))
+                .peek(userCourse -> userCourse.setCoursePrivilege(
+                        revoke ? CoursePrivilege.STUDENT : CoursePrivilege.ASSISTANT))
                 .collect(Collectors.toList()));
         courseRepository.save(course);
     }
@@ -172,6 +184,12 @@ public class CourseService {
     public Stream<User> getAssistants(Course course) {
         return course.getUsers().stream()
                 .filter(userCourse -> userCourse.getCoursePrivilege().equals(CoursePrivilege.ASSISTANT))
+                .map(UserCourse::getUser);
+    }
+
+    public Stream<User> getStudents(Course course) {
+        return course.getUsers().stream()
+                .filter(userCourse -> userCourse.getCoursePrivilege().equals(CoursePrivilege.STUDENT))
                 .map(UserCourse::getUser);
     }
 
