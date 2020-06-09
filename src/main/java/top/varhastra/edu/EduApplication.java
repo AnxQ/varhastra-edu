@@ -27,8 +27,8 @@ public class EduApplication implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOrigins("http://localhost:8080");
-//        registry.addMapping("/video/**").allowedOrigins("http://localhost:8080");
+        registry.addMapping("/img/**").allowedOrigins("http://localhost:8080");
+        registry.addMapping("/video/**").allowedOrigins("http://localhost:8080");
     }
 
     public static void main(String[] args) {
